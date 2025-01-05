@@ -10,13 +10,16 @@ let iLoopCount=0
 
 eAddLoop.addEventListener("click", function () {addLoop(0)});
 document.getElementById("action-0").addEventListener('change',function () {updateActions(0)});
+document.getElementById("shrink-0").addEventListener('click',function () {shrinkCard(0)});
 
 
-function addLoop(iLoop){
+function addLoop(iLoop,padding){
     iLoopCount++;
     const loopContainer = document.createElement("div");
-    loopContainer.style.marginLeft = iLoop * 10 + "px";
-    loopContainer.id="actions-div-"+iLoopCount
+    loopContainer.style.marginLeft = "10px";
+    loopContainer.style.marginRight = "2px";
+    loopContainer.id="actions-div-"+iLoopCount;
+    loopContainer.className="card border-black mb-3";
     loopContainer.innerHTML = 
         "<p style='margin-left:"+(iLoop*10)+
         "px;'>Loop "+iLoopCount+"<p style='margin-left:"+(iLoop+1)*10+
@@ -107,3 +110,19 @@ function updateTotalIterations(data) {
 
   return data;
 }
+
+function shrinkCard(id){
+console.log(id)
+    document.getElementById("shrink-"+id).display="none";
+    document.getElementById("grow-"+id).display=null;
+    document.getElementById("actions-div-"+id).style="height:100px;transition:height 0.5s; overflow:hidden;";
+    
+}
+
+function growCard(id){
+    console.log(id)
+        document.getElementById("grow-"+id).display="none";
+        document.getElementById("shrink-"+id).display=null;
+        document.getElementById("actions-div-"+id).style="height:auto;transition:height 0.5s;";
+        
+    }
