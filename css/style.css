@@ -11,6 +11,10 @@
   position:absolute; right:0px; top:0px;
 }
 
+.animated-height {
+  transition: height 0.5s ease;
+}
+
 body {
   overflow-x: hidden;
   position: relative; }

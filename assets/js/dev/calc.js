@@ -1,3 +1,6 @@
+let iElementAutoHeight=0
+
+const eRuns=document.getElementById("runs-0");
 const eAddLoop=document.getElementById("addLoop-button");
 let aLoops=[{
     type:"action",
@@ -11,6 +14,7 @@ let iLoopCount=0
 eAddLoop.addEventListener("click", function () {addLoop(0)});
 document.getElementById("action-0").addEventListener('change',function () {updateActions(0)});
 document.getElementById("shrink-0").addEventListener('click',function () {shrinkCard(0)});
+document.getElementById("grow-0").addEventListener('click',function () {growCard(0)});
 
 
 function addLoop(iLoop,padding){
@@ -59,6 +63,7 @@ function updateActions(id){
         }
     )
     console.log(aLoops)
+    totalAPIs()
 }
 
 function updateIterations(id){
@@ -84,7 +89,7 @@ function totalAPIs(){
         iTotalAPIS+=(item.totalIterations*item.actions)
     })
     
-
+    eRuns.innerText=iTotalAPIS; 
     console.log(iTotalAPIS);
 }
 
@@ -111,18 +116,41 @@ function updateTotalIterations(data) {
   return data;
 }
 
-function shrinkCard(id){
-console.log(id)
-    document.getElementById("shrink-"+id).display="none";
-    document.getElementById("grow-"+id).display=null;
-    document.getElementById("actions-div-"+id).style="height:100px;transition:height 0.5s; overflow:hidden;";
+function shrinkCard(id) {
     
+    document.getElementById("shrink-" + id).style.display = "none";
+    document.getElementById("grow-" + id).style.display = "";
+    const actionsDiv = document.getElementById("actions-div-" + id);
+    
+    iElementAutoHeight=actionsDiv.scrollHeight ;
+    actionsDiv.style.height = actionsDiv.offsetHeight + "px";
+
+    requestAnimationFrame(() => {
+        actionsDiv.style.transition = "height 0.5s ease";
+        actionsDiv.style.height = "100px";
+        actionsDiv.style.overflow = "hidden";
+    });
+    
+
+   
 }
 
-function growCard(id){
-    console.log(id)
-        document.getElementById("grow-"+id).display="none";
-        document.getElementById("shrink-"+id).display=null;
-        document.getElementById("actions-div-"+id).style="height:auto;transition:height 0.5s;";
-        
+function growCard(id) {
+  
+    document.getElementById("grow-" + id).style.display = "none";
+    document.getElementById("shrink-" + id).style.display = "";
+    const actionsDiv = document.getElementById("actions-div-" + id);
+    actionsDiv.addEventListener("transitionend", onTransitionEnd);
+    requestAnimationFrame(() => {
+        actionsDiv.style.transition = "height 0.5s ease";
+        actionsDiv.style.height=iElementAutoHeight+"px";        
+    });
+}
+
+function onTransitionEnd(event) {
+    if (event.propertyName === "height") { 
+        const box = event.target;        
+        box.removeEventListener("transitionend", onTransitionEnd);
+        box.style.height = "auto";
     }
+}
