@@ -6,7 +6,7 @@ const eAddLoop=document.getElementById("addLoop-button-1-0");
 const eAddCondition=document.getElementById("addCond-button-1-0");
 const eAddCard=document.getElementById("addFlow");
 
-let aLoops=[{
+let aContainers=[{
     type:"action",
     id: 0,
     iterations:1,
@@ -16,126 +16,21 @@ let aLoops=[{
     card:1
 }];
 
+let aCards=[{
+    cardId:1,
+    name:"Flow 1",
+    daily:1,
+    run:1
+}];
+
 eAddCard.addEventListener("click", addCard);
 eAddCondition.addEventListener("click", function () {addCondition(0,1)});
 eAddLoop.addEventListener("click", function () {addLoop(0,1)});
 document.getElementById("action-1-0").addEventListener('change',function () {updateActions(0,1)});
 document.getElementById("shrink-1").addEventListener('click',function () {shrinkCard(1)});
 document.getElementById("grow-1").addEventListener('click',function () {growCard(1)});
-
-
-
-function addLoop(iLoop,iCard){
-    const iLoopCount=aLoops.filter(item => item.type === "loop" && item.card==iCard).length+1;   
-    const container = document.createElement("div");
-    container.style.marginLeft = "10px";
-    container.style.marginRight = "2px";
-    container.id="actions-div-"+iCard+"-"+iLoopCount;
-    container.className="card border-black mb-3";
-    container.innerHTML ="<p style='margin-left:"+(iLoop*10)+
-    "px;'>Loop "+iLoopCount+"<p style='margin-left:"+(iLoop+1)*10+
-    "px;'>Iterations:<input id='loop-"+iCard+"-"+iLoopCount+"' type='number' value='1'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+iLoopCount+
-    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+iLoopCount+
-    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+iLoopCount+
-    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iLoop+1)*10+
-    "px;'>Child actions:<input id='action-"+iCard+"-"+iLoopCount+"' type='number' value='1'/></p>"
-
-    document.getElementById("actions-div-"+iCard+"-"+iLoop).appendChild(container);
-    console.log("addLoop-button-"+iCard+"-"+iLoopCount)
-    document.getElementById("addLoop-button-"+iCard+"-"+iLoopCount).addEventListener('click',function () {addLoop(iLoopCount,iCard)});
-    document.getElementById("addCon-button-"+iCard+"-"+iLoopCount).addEventListener('click',function () {addCondition(iLoopCount,iCard)});
-    document.getElementById("delete-button-"+iCard+"-"+iLoopCount).addEventListener('click',function () {deleteContainer(iLoopCount,iCard)});
-    document.getElementById("loop-"+iCard+"-"+iLoopCount).addEventListener('change',function () {updateIterations(iLoopCount,iCard)});
-    document.getElementById("action-"+iCard+"-"+iLoopCount).addEventListener('change',function () {updateActions(iLoopCount,iCard)});
-    aLoops.push(
-        {
-            type:"loop",
-            id: iLoopCount,
-            iterations:1,
-            parent:iLoop,
-            actions:1,
-            totalIterations:1,
-            card:iCard
-        }
-    )  
-}
-
-function addCondition(iCon,iCard){
-    const iConCount=aLoops.filter(item => item.type === "condition" && item.card==iCard).length+1;   
-    const container = document.createElement("div");
-    container.style.marginLeft = "10px";
-    container.style.marginRight = "2px";
-    container.id="actions-div-"+iCard+"-"+iConCount;
-    container.className="card border-black mb-3";
-    container.innerHTML ="<p style='margin-left:"+(iCon*10)+
-    "px;'>Condition "+iConCount+"<p style='margin-left:"+(iCon+1)*10+
-    "px;'>Yes %&nbsp;<input id='conY-"+iCard+"-"+iConCount+"' type='number' value='50' style='width:90px'/>&nbsp;&nbsp;No %&nbsp;<input id='conN-"+iCard+"-"+iConCount+"' type='number' value='50' style='width:90px'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+iConCount+
-    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+iConCount+
-    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+iConCount+
-    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iCon+1)*10+
-    "px;'>Yes child actions:&nbsp;<input id='actionY-"+iCard+"-"+iConCount+"' type='number' value='1'  style='width:90px'/>No child actions&nbsp;<input id='actionN-"+iCard+"-"+iConCount+"' type='number' value='1'  style='width:90px'/></p>"
-
-    document.getElementById("actions-div-"+iCard+"-"+iCon).appendChild(container);
-    document.getElementById("addLoop-button-"+iCard+"-"+iConCount).addEventListener('click',function () {addLoop(iConCount,iCard)});
-    document.getElementById("addCon-button-"+iCard+"-"+iConCount).addEventListener('click',function () {addCondition(iConCount,iCard)});
-    document.getElementById("delete-button-"+iCard+"-"+iConCount).addEventListener('click',function () {addCondition(iConCount,iCard)});
-    document.getElementById("conY-"+iCard+"-"+iConCount).addEventListener('change',function () {updateCondition(iConCount,iCard,"y")});
-    document.getElementById("actionY-"+iCard+"-"+iConCount).addEventListener('change',function () {updateCondition(iConCount,iCard,"-")});
-    document.getElementById("conN-"+iCard+"-"+iConCount).addEventListener('change',function () {updateCondition(iConCount,iCard,"n")});
-    document.getElementById("actionN-"+iCard+"-"+iConCount).addEventListener('change',function () {updateCondition(iConCount,iCard,"-")});
-    aLoops.push(
-        {
-            type:"condition",
-            id: iConCount,
-            iterations:1,
-            parent:iCon,
-            actions:1,
-            totalIterations:1,
-            card:iCard
-        }
-    )  
-}
-
-function updateCondition(id,iCard,branch){
-    const eYesPercentage= document.getElementById("conY-"+iCard+"-"+id);
-    const eNoPercentage= document.getElementById("conN-"+iCard+"-"+id);
-    if(branch=="y"){
-        eNoPercentage.value=100-eYesPercentage.value;
-    }else if(branch=="n"){
-        eYesPercentage.value=100-eNosPercentage.value;
-    } 
-    const iYesActions= Math.ceil(document.getElementById("actionY-"+iCard+"-"+id).value*(eYesPercentage.value/100));
-    const iNoActions= Math.floor(document.getElementById("actionN-"+iCard+"-"+id).value*(eNoPercentage.value/100));
-    console.log(iYesActions,iNoActions,eYesPercentage.value,eNoPercentage.value)
-    const updateItem=aLoops.find(item => item.id === id && item.card==iCard && item.type=="condition");    
-    Object.assign(updateItem,
-        {
-            type:updateItem.type,
-            id: id,
-            iterations:updateItem.iterations,
-            parent:updateItem.parent,
-            actions:iYesActions+iNoActions+1,
-            totalIterations:updateItem.iterations,
-            card:iCard
-        }
-    )
-    totalAPIs(iCard);
-}
-
-function deleteContainer(i,iCard){
-    document.getElementById("actions-div-"+iCard+"-"+i).remove();
-    getChildAndDelete(i,iCard);
-}
-
-function getChildAndDelete(id,iCard){
-    aLoops = aLoops.filter(item => item.id !== id);
-    const aDelete=aLoops.filter(item => item.parent === id && item.card==iCard); 
-    aDelete.forEach(item =>{    
-        getChildAndDelete(item.id,iCard)
-    })
-}
-
-
+document.getElementById("daily-1").addEventListener('click',function () {updateDaily(1)});
+document.getElementById("title-1").addEventListener('click',function () {updateCardTitle(1)});
 
 function addCard(){
     iFlows++;
@@ -152,21 +47,239 @@ function addCard(){
     eNewCard.querySelector("#shrink-1").id="shrink-"+id;
     eNewCard.querySelector("#grow-1").id="grow-"+id;
     eNewCard.querySelector("#apis-1").id="apis-"+id;
-    eNewCard.querySelector("#action-1").id="action-"+id;
+    eNewCard.querySelector("#action-1-0").id="action-"+id+"-0";
     eNewCard.querySelector("#addLoop-button-1-0").id="addLoop-button-"+id+"-0";
-    document.getElementById("action-"+id).addEventListener('change',function () {updateActions(id)});
+    document.getElementById("action-"+id+"-0").addEventListener('change',function () {updateActions(id)});
     document.getElementById("shrink-"+id).addEventListener('click',function () {shrinkCard(id)});
     document.getElementById("grow-"+id).addEventListener('click',function () {growCard(id)});
-    document.getElementById("addLoop-button-"+id+"-0").addEventListener("click", function () {addLoop(0,id)});
-  
+    document.getElementById("addLoop-button-"+id+"-0").addEventListener("click", function () {addLoop(0,id)});  
+    document.getElementById("daily-"+id).addEventListener('click',function () {updateDaily(id)});
+    document.getElementById("title-"+id).addEventListener('click',function () {updateCardTitle(id)});
+
+    aCards.push(
+        {
+            cardId:1,
+            name:"Flow "+iFlows,
+            daily:1,
+            run:1
+        }
+    )
 }
 
+function addLoop(iLoop,iCard){
+    const iLoopCount=aContainers.filter(item => item.type === "loop" && item.card==iCard).length+1;   
+    const id=aContainers.length+1
+    const container = document.createElement("div");
+    container.style.marginLeft = "10px";
+    container.style.marginRight = "2px";
+    container.id="actions-div-"+iCard+"-"+id;
+    container.className="card border-black mb-3";
+    container.innerHTML ="<p style='margin-left:"+(iLoop*10)+
+    "px;' contenteditable='true'>Loop "+iLoopCount+"</p><p style='margin-left:"+(iLoop+1)*10+
+    "px;'>Iterations:<input id='loop-"+iCard+"-"+id+"' type='number' value='1'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+id+
+    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+id+
+    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+id+
+    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iLoop+1)*10+
+    "px;'>Child actions:<input id='action-"+iCard+"-"+id+"' type='number' value='1'/></p>"
 
-function updateActions(id,iCard){
-    const updateItem=aLoops.find(item => item.id === id && item.card==iCard && item.type=="loop");    
+    document.getElementById("actions-div-"+iCard+"-"+iLoop).appendChild(container);
+    console.log("addLoop-button-"+iCard+"-"+iLoopCount)
+    document.getElementById("addLoop-button-"+iCard+"-"+id).addEventListener('click',function () {addLoop(id,iCard)});
+    document.getElementById("addCon-button-"+iCard+"-"+id).addEventListener('click',function () {addCondition(id,iCard)});
+    document.getElementById("delete-button-"+iCard+"-"+id).addEventListener('click',function () {deleteContainer(id,iCard)});
+    document.getElementById("loop-"+iCard+"-"+id).addEventListener('change',function () {updateIterations(id,iCard)});
+    document.getElementById("action-"+iCard+"-"+id).addEventListener('change',function () {updateActions(id,iCard)});
+    aContainers.push(
+        {
+            type:"loop",
+            typeId: iLoopCount,
+            id:id,
+            iterations:1,
+            parent:iLoop,
+            actions:1,
+            totalIterations:1,
+            card:iCard
+        }
+    )  
+}
+
+function addCondition(iCon,iCard){
+    const iConCount=aContainers.filter(item => item.type === "condition" && item.card==iCard).length+1;
+    let id=aContainers.length+1;
+    let container = document.createElement("div");
+    container.style.marginLeft = "10px";
+    container.style.marginRight = "2px";
+    container.id="actions-div-"+iCard+"-"+id;
+    container.className="card border-black mb-3";
+    container.innerHTML ="<p style='margin-left:"+(iCon*10)+
+    "px;'><span id='conTitle-"+iCard+"-"+id+"' contenteditable='true'>Condition "+iConCount+"</span>&nbsp;&nbsp;<span id='conCalc-"+iCard+"-"+id+"'><p style='margin-left:"+(iCon+1)*10+
+    "px;'>Yes %&nbsp;<input id='con-"+iCard+"-"+id+"' type='number' value='50' min='0' max='100'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+id+
+    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+id+
+    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+id+
+    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iCon+1)*10+
+    "px;'>Yes child actions:&nbsp;<input id='action-"+iCard+"-"+id+"' type='number' value='1'/></p>"
+
+    document.getElementById("actions-div-"+iCard+"-"+iCon).appendChild(container);
+    document.getElementById("addLoop-button-"+iCard+"-"+id).addEventListener('click',function () {addLoop(id,iCard)});
+    document.getElementById("addCon-button-"+iCard+"-"+id).addEventListener('click',function () {addCondition(id,iCard)});
+    document.getElementById("delete-button-"+iCard+"-"+id).addEventListener('click',function () {deleteCondition(id,iCard)});
+    document.getElementById("con-"+iCard+"-"+id).addEventListener('change',function () {updateConditionPercent(id,iCard,"y")});
+    document.getElementById("action-"+iCard+"-"+id).addEventListener('change',function () {updateCondition(id,iCard,"y")});
+    document.getElementById("conTitle-"+iCard+"-"+id).addEventListener('input', (event) => {updateConTitle(id,iCard)});
+
+    const idN=aContainers.length+2;
+    container = document.createElement("div");
+    container.style.marginLeft = "10px";
+    container.style.marginRight = "2px";
+    container.id="actions-div-"+iCard+"-"+idN;
+    container.className="card border-black mb-3";
+    container.innerHTML ="<p id='conTitle-"+iCard+"-"+idN+"' style='margin-left:"+(iCon*10)+
+    "px;'>Condition "+iConCount+"</p><p style='margin-left:"+(iCon+1)*10+
+    "px;'>&nbsp;No %&nbsp;<input id='con-"+iCard+"-"+idN+"' type='number' value='50' min='0' max='100' style='width:90px'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+idN+
+    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+idN+
+    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button></p><p style='margin-left:"+(iCon+1)*10+
+    "px;'>No child actions&nbsp;<input id='action-"+iCard+"-"+idN+"' type='number' value='1' style='width:90px'/></p>"
+
+    document.getElementById("actions-div-"+iCard+"-"+iCon).appendChild(container);
+    document.getElementById("addLoop-button-"+iCard+"-"+idN).addEventListener('click',function () {addLoop(idN,iCard)});
+    document.getElementById("addCon-button-"+iCard+"-"+idN).addEventListener('click',function () {addCondition(idN,iCard)});
+    document.getElementById("con-"+iCard+"-"+idN).addEventListener('change',function () {updateConditionPercent(idN,iCard,"n")});
+    document.getElementById("action-"+iCard+"-"+idN).addEventListener('change',function () {updateCondition(idN,iCard,"n")});
+    aContainers.push(
+        {
+            type:"condition",
+            typeId: iConCount,
+            id:id,
+            iterations:1,
+            parent:iCon,
+            actions:2,
+            totalIterations:1,
+            card:iCard
+        },
+        {
+            type:"condition",
+            typeId: iConCount,
+            id:idN,
+            iterations:1,
+            parent:iCon,
+            actions:1,
+            totalIterations:1,
+            card:iCard
+        }
+    )  
+}
+
+function updateCardTitle(id){
+    const updateItem=aCards.find(item => item.id === id);  
+    Object.assign(updateItem,
+        {
+            cardId:updateItem.id,
+            name:sTitle,
+            daily:updateItem.daily,
+            run:updateItem.run
+        }
+    )
+
+}
+
+function updateConTitle(id,iCard){
+    console.log(iCard,id)
+    const sTitle=document.getElementById("conTitle-"+iCard+"-"+id).innerText;
+    document.getElementById("conTitle-"+iCard+"-"+(id+1)).innerText=sTitle;
+}
+
+function updateCondition(id,iCard,branch){
+    let iActions=0;
+    let iYes=0;
+    let iNo=0;
+    let iId=0;
+    if(branch=="y"){
+        iActions=Math.ceil(Number(document.getElementById("action-"+iCard+"-"+id).value*(document.getElementById("con-"+iCard+"-"+id).value/100)))+1;
+        iYes=iActions;   
+        iNo=aContainers.find(item => item.id === (id+1) && item.card==iCard && item.type=="condition").totalIterations; 
+        iId=id; 
+    }else if(branch=="n"){
+        iActions=Math.floor(Number(document.getElementById("action-"+iCard+"-"+id).value*(document.getElementById("con-"+iCard+"-"+id).value/100)));
+        iYes=aContainers.find(item => item.id === (id-1) && item.card==iCard && item.type=="condition").totalIterations;   
+        iNo=iActions; 
+        iId=(id-1);
+    } 
+    const updateItem=aContainers.find(item => item.id === id && item.card==iCard && item.type=="condition");  
     Object.assign(updateItem,
         {
             type:updateItem.type,
+            typeId:updateItem.type,
+            id: id,
+            iterations:updateItem.iterations,
+            parent:updateItem.parent,
+            actions:Number(document.getElementById("action-"+iCard+"-"+id).value),
+            totalIterations:iActions,
+            card:iCard
+        }
+    )
+      
+    document.getElementById("conCalc-"+iCard+"-"+iId).innerText="Actions = Yes: "+iYes+", No:"+iNo;
+    console.log(aContainers)
+    updateDaily(iCard);
+}
+
+function updateConditionPercent(id,iCard,branch){
+    let eYesPercentage;
+    let eNoPercentage;
+    let yId=0;
+    let nId=0;
+    if(branch=="y"){
+        eYesPercentage=document.getElementById("con-"+iCard+"-"+id);
+        eNoPercentage=document.getElementById("con-"+iCard+"-"+(id+1));
+        yId=id;
+        nId=id+1;
+        eNoPercentage.value=100-eYesPercentage.value;
+    }else if(branch=="n"){
+        eYesPercentage=document.getElementById("con-"+iCard+"-"+(id-1));
+        eNoPercentage=document.getElementById("con-"+iCard+"-"+id);
+        yId=id-1;
+        nId=id;
+        eYesPercentage.value=100-eNoPercentage.value;
+    } 
+
+    if(eYesPercentage.value>100 || eNoPercentage.value<0){eYesPercentage.value=100;eNoPercentage.value=0}
+    if(eNoPercentage.value>100 || eYesPercentage.value<0){eNoPercentage.value=100;eYesPercentage.value=0}
+    const iYesActions= Math.ceil(document.getElementById("action-"+iCard+"-"+id).value*(eYesPercentage.value/100));
+    const iNoActions= Math.floor(document.getElementById("action-"+iCard+"-"+id).value*(eNoPercentage.value/100));
+    console.log(iYesActions,iNoActions,eYesPercentage.value,eNoPercentage.value)
+    const updateItem=aContainers.find(item => item.id === id && item.card==iCard && item.type=="condition");    
+    Object.assign(updateItem,
+        {
+            type:updateItem.type,
+            id: yId,
+            iterations:updateItem.iterations,
+            parent:updateItem.parent,
+            actions:iYesActions+iNoActions+1,
+            totalIterations:updateItem.iterations,
+            card:iCard
+        }
+    )
+    const updateItemN=aContainers.find(item => item.id === id && item.card==iCard && item.type=="condition");    
+    Object.assign(updateItemN,
+        {
+            type:updateItem.type,
+            id: nId,
+            iterations:updateItem.iterations,
+            parent:updateItem.parent,
+            actions:iYesActions+iNoActions,
+            totalIterations:updateItem.iterations,
+            card:iCard
+        }
+    )
+    updateDaily(iCard);
+}
+
+function updateActions(id,iCard){
+    const updateItem=aContainers.find(item => item.id === id && item.card==iCard);    
+    Object.assign(updateItem,
+        {
+            type:updateItem.type,
+            typeId:updateItem.type,
             id: id,
             iterations:updateItem.iterations,
             parent:updateItem.parent,
@@ -175,33 +288,40 @@ function updateActions(id,iCard){
             card:iCard
         }
     )
-    totalAPIs(iCard);
+    updateDaily(iCard);
 }
 
 function updateIterations(id,iCard){
-    const updateItem=aLoops.find(item => item.id === id && item.card==iCard);    
+    const updateItem=aContainers.find(item => item.id === id && item.card==iCard);    
     Object.assign(updateItem,
         {
             type:updateItem.type,
+            typeId:updateItem.type,
             id: id,
-            iterations:Number(document.getElementById("loop-"+id).value),
+            iterations:Number(document.getElementById("loop-"+iCard+"-"+id).value),
             parent:updateItem.parent,
             actions:updateItem.actions,
-            totalIterations:Number(document.getElementById("loop-"+id).value),
+            totalIterations:Number(document.getElementById("loop-"+iCard+"-"+id).value),
             card:iCard
         }
     )
-    totalAPIs(iCard);
+    updateDaily(iCard);
+}
+
+function updateDaily(iCard){
+    const iTotalAPIS=totalAPIs(iCard);
+    const iDaily = Number(document.getElementById("daily-"+iCard).value);
+    document.getElementById("apis-"+iCard).innerText=iTotalAPIS*iDaily;
 }
 
 function totalAPIs(iCard){
-    const updatedData = aLoops.filter(item =>{return item.card==iCard})
+    const updatedData = aContainers.filter(item =>{return item.card==iCard})
     let iTotalAPIS=0;
     updatedData.forEach(item =>{
         iTotalAPIS+=(item.totalIterations*item.actions)
     })    
     document.getElementById("runs-"+iCard).innerText=iTotalAPIS; 
-    console.log(iTotalAPIS);
+    return iTotalAPIS;
 }
 
 function updateTotalIterations(data) {
@@ -227,11 +347,30 @@ function updateTotalIterations(data) {
   return data;
 }
 
-function shrinkCard(id) {
+function deleteCondition(id,iCard){
+    deleteContainer(id,iCard);
+    deleteContainer((id+1),iCard);
+}
+
+
+function deleteContainer(id,iCard){
+    document.getElementById("actions-div-"+iCard+"-"+id).remove();
+    getChildAndDelete(id,iCard);
+}
+
+function getChildAndDelete(id,iCard){
+    aContainers = aContainers.filter(item => item.id !== id);
+    const aDelete=aContainers.filter(item => item.parent === id && item.card==iCard); 
+    aDelete.forEach(item =>{    
+        getChildAndDelete(item.id,iCard)
+    })
+}
+
+function shrinkCard(id,iCard) {
     
-    document.getElementById("shrink-" + id).style.display = "none";
-    document.getElementById("grow-" + id).style.display = "";
-    const actionsDiv = document.getElementById("actions-div-" + id);
+    document.getElementById("shrink-"+id).style.display = "none";
+    document.getElementById("grow-"+id).style.display = "";
+    const actionsDiv = document.getElementById("actions-div-"+id+"-0");
     
     iElementAutoHeight=actionsDiv.scrollHeight ;
     actionsDiv.style.height = actionsDiv.offsetHeight + "px";
@@ -240,17 +379,14 @@ function shrinkCard(id) {
         actionsDiv.style.transition = "height 0.5s ease";
         actionsDiv.style.height = "100px";
         actionsDiv.style.overflow = "hidden";
-    });
-    
-
-   
+    });   
 }
 
 function growCard(id) {
   
-    document.getElementById("grow-" + id).style.display = "none";
-    document.getElementById("shrink-" + id).style.display = "";
-    const actionsDiv = document.getElementById("actions-div-" + id);
+    document.getElementById("grow-"+id).style.display = "none";
+    document.getElementById("shrink-"+id).style.display = "";
+    const actionsDiv = document.getElementById("actions-div-"+id+"-0");
     actionsDiv.addEventListener("transitionend", onTransitionEnd);
     requestAnimationFrame(() => {
         actionsDiv.style.transition = "height 0.5s ease";
