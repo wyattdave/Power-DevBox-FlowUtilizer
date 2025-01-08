@@ -3,6 +3,7 @@ let iFlows=1;
 
 const eTemplate=document.getElementById("card-0").cloneNode(true);
 const eAddLoop=document.getElementById("addLoop-button-1-0");
+const eAddCondition=document.getElementById("addCond-button-1-0");
 const eAddCard=document.getElementById("addFlow");
 
 let aLoops=[{
@@ -16,6 +17,7 @@ let aLoops=[{
 }];
 
 eAddCard.addEventListener("click", addCard);
+eAddCondition.addEventListener("click", function () {addCondition(0,1)});
 eAddLoop.addEventListener("click", function () {addLoop(0,1)});
 document.getElementById("action-1-0").addEventListener('change',function () {updateActions(0,1)});
 document.getElementById("shrink-1").addEventListener('click',function () {shrinkCard(1)});
@@ -24,24 +26,26 @@ document.getElementById("grow-1").addEventListener('click',function () {growCard
 
 
 function addLoop(iLoop,iCard){
+    const iLoopCount=aLoops.filter(item => item.type === "loop" && item.card==iCard).length+1;   
+    const container = document.createElement("div");
+    container.style.marginLeft = "10px";
+    container.style.marginRight = "2px";
+    container.id="actions-div-"+iCard+"-"+iLoopCount;
+    container.className="card border-black mb-3";
+    container.innerHTML ="<p style='margin-left:"+(iLoop*10)+
+    "px;'>Loop "+iLoopCount+"<p style='margin-left:"+(iLoop+1)*10+
+    "px;'>Iterations:<input id='loop-"+iCard+"-"+iLoopCount+"' type='number' value='1'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+iLoopCount+
+    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+iLoopCount+
+    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+iLoopCount+
+    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iLoop+1)*10+
+    "px;'>Child actions:<input id='action-"+iCard+"-"+iLoopCount+"' type='number' value='1'/></p>"
 
-    const iLoopCount=iLoop+1
-    const loopContainer = document.createElement("div");
-    loopContainer.style.marginLeft = "10px";
-    loopContainer.style.marginRight = "2px";
-    loopContainer.id="actions-div-"+iCard+"-"+iLoopCount;
-    loopContainer.className="card border-black mb-3";
-    loopContainer.innerHTML = 
-        "<p style='margin-left:"+(iLoop*10)+
-        "px;'>Loop "+iLoopCount+"<p style='margin-left:"+(iLoop+1)*10+
-        "px;'>Iterations:<input id='loop-"+iLoopCount+"' type='number' value='1'/><Button id='addLoop-button-"+iCard+"-"+iLoopCount+
-        "'>+</Button></p><p style='margin-left:"+(iLoop+1)*10+
-        "px;'>Child actions:<input id='action-"+iCard+"-"+iLoopCount+"' type='number' value='1'/></p>";
-        console.log("actions-div-"+iCard+"-"+iLoop)
-    document.getElementById("actions-div-"+iCard+"-"+iLoop).appendChild(loopContainer);
+    document.getElementById("actions-div-"+iCard+"-"+iLoop).appendChild(container);
     console.log("addLoop-button-"+iCard+"-"+iLoopCount)
     document.getElementById("addLoop-button-"+iCard+"-"+iLoopCount).addEventListener('click',function () {addLoop(iLoopCount,iCard)});
-    document.getElementById("loop-"+iLoopCount).addEventListener('change',function () {updateIterations(iLoopCount,iCard)});
+    document.getElementById("addCon-button-"+iCard+"-"+iLoopCount).addEventListener('click',function () {addCondition(iLoopCount,iCard)});
+    document.getElementById("delete-button-"+iCard+"-"+iLoopCount).addEventListener('click',function () {deleteContainer(iLoopCount,iCard)});
+    document.getElementById("loop-"+iCard+"-"+iLoopCount).addEventListener('change',function () {updateIterations(iLoopCount,iCard)});
     document.getElementById("action-"+iCard+"-"+iLoopCount).addEventListener('change',function () {updateActions(iLoopCount,iCard)});
     aLoops.push(
         {
@@ -55,6 +59,83 @@ function addLoop(iLoop,iCard){
         }
     )  
 }
+
+function addCondition(iCon,iCard){
+    const iConCount=aLoops.filter(item => item.type === "condition" && item.card==iCard).length+1;   
+    const container = document.createElement("div");
+    container.style.marginLeft = "10px";
+    container.style.marginRight = "2px";
+    container.id="actions-div-"+iCard+"-"+iConCount;
+    container.className="card border-black mb-3";
+    container.innerHTML ="<p style='margin-left:"+(iCon*10)+
+    "px;'>Condition "+iConCount+"<p style='margin-left:"+(iCon+1)*10+
+    "px;'>Yes %&nbsp;<input id='conY-"+iCard+"-"+iConCount+"' type='number' value='50' style='width:90px'/>&nbsp;&nbsp;No %&nbsp;<input id='conN-"+iCard+"-"+iConCount+"' type='number' value='50' style='width:90px'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+iConCount+
+    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+iConCount+
+    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+iConCount+
+    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iCon+1)*10+
+    "px;'>Yes child actions:&nbsp;<input id='actionY-"+iCard+"-"+iConCount+"' type='number' value='1'  style='width:90px'/>No child actions&nbsp;<input id='actionN-"+iCard+"-"+iConCount+"' type='number' value='1'  style='width:90px'/></p>"
+
+    document.getElementById("actions-div-"+iCard+"-"+iCon).appendChild(container);
+    document.getElementById("addLoop-button-"+iCard+"-"+iConCount).addEventListener('click',function () {addLoop(iConCount,iCard)});
+    document.getElementById("addCon-button-"+iCard+"-"+iConCount).addEventListener('click',function () {addCondition(iConCount,iCard)});
+    document.getElementById("delete-button-"+iCard+"-"+iConCount).addEventListener('click',function () {addCondition(iConCount,iCard)});
+    document.getElementById("conY-"+iCard+"-"+iConCount).addEventListener('change',function () {updateCondition(iConCount,iCard,"y")});
+    document.getElementById("actionY-"+iCard+"-"+iConCount).addEventListener('change',function () {updateCondition(iConCount,iCard,"-")});
+    document.getElementById("conN-"+iCard+"-"+iConCount).addEventListener('change',function () {updateCondition(iConCount,iCard,"n")});
+    document.getElementById("actionN-"+iCard+"-"+iConCount).addEventListener('change',function () {updateCondition(iConCount,iCard,"-")});
+    aLoops.push(
+        {
+            type:"condition",
+            id: iConCount,
+            iterations:1,
+            parent:iCon,
+            actions:1,
+            totalIterations:1,
+            card:iCard
+        }
+    )  
+}
+
+function updateCondition(id,iCard,branch){
+    const eYesPercentage= document.getElementById("conY-"+iCard+"-"+id);
+    const eNoPercentage= document.getElementById("conN-"+iCard+"-"+id);
+    if(branch=="y"){
+        eNoPercentage.value=100-eYesPercentage.value;
+    }else if(branch=="n"){
+        eYesPercentage.value=100-eNosPercentage.value;
+    } 
+    const iYesActions= Math.ceil(document.getElementById("actionY-"+iCard+"-"+id).value*(eYesPercentage.value/100));
+    const iNoActions= Math.floor(document.getElementById("actionN-"+iCard+"-"+id).value*(eNoPercentage.value/100));
+    console.log(iYesActions,iNoActions,eYesPercentage.value,eNoPercentage.value)
+    const updateItem=aLoops.find(item => item.id === id && item.card==iCard && item.type=="condition");    
+    Object.assign(updateItem,
+        {
+            type:updateItem.type,
+            id: id,
+            iterations:updateItem.iterations,
+            parent:updateItem.parent,
+            actions:iYesActions+iNoActions+1,
+            totalIterations:updateItem.iterations,
+            card:iCard
+        }
+    )
+    totalAPIs(iCard);
+}
+
+function deleteContainer(i,iCard){
+    document.getElementById("actions-div-"+iCard+"-"+i).remove();
+    getChildAndDelete(i,iCard);
+}
+
+function getChildAndDelete(id,iCard){
+    aLoops = aLoops.filter(item => item.id !== id);
+    const aDelete=aLoops.filter(item => item.parent === id && item.card==iCard); 
+    aDelete.forEach(item =>{    
+        getChildAndDelete(item.id,iCard)
+    })
+}
+
+
 
 function addCard(){
     iFlows++;
@@ -82,7 +163,7 @@ function addCard(){
 
 
 function updateActions(id,iCard){
-    const updateItem=aLoops.find(item => item.id === id && item.card==iCard);    
+    const updateItem=aLoops.find(item => item.id === id && item.card==iCard && item.type=="loop");    
     Object.assign(updateItem,
         {
             type:updateItem.type,
