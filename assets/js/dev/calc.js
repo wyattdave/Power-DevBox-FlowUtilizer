@@ -112,7 +112,7 @@ function addCondition(iCon,iCard){
     container.id="actions-div-"+iCard+"-"+id;
     container.className="card border-black mb-3";
     container.innerHTML ="<p style='margin-left:"+(iCon*10)+
-    "px;'><span id='conTitle-"+iCard+"-"+id+"' contenteditable='true'>Condition "+iConCount+"</span>&nbsp;&nbsp;<span id='conCalc-"+iCard+"-"+id+"'><p style='margin-left:"+(iCon+1)*10+
+    "px;'><span id='conTitle-"+iCard+"-"+id+"' contenteditable='true'>Condition "+iConCount+"</span>&nbsp;&nbsp;<span id='conCalc-"+iCard+"-"+id+"'>Yes: 1, No:1</span><p style='margin-left:"+(iCon+1)*10+
     "px;'>Yes %&nbsp;<input id='con-"+iCard+"-"+id+"' type='number' value='50' min='0' max='100'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+id+
     "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+id+
     "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+id+
@@ -135,7 +135,7 @@ function addCondition(iCon,iCard){
     container.className="card border-black mb-3";
     container.innerHTML ="<p id='conTitle-"+iCard+"-"+idN+"' style='margin-left:"+(iCon*10)+
     "px;'>Condition "+iConCount+"</p><p style='margin-left:"+(iCon+1)*10+
-    "px;'>&nbsp;No %&nbsp;<input id='con-"+iCard+"-"+idN+"' type='number' value='50' min='0' max='100' style='width:90px'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+idN+
+    "px;'>&No %&nbsp;<input id='con-"+iCard+"-"+idN+"' type='number' value='50' min='0' max='100' style='width:90px'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+idN+
     "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+idN+
     "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button></p><p style='margin-left:"+(iCon+1)*10+
     "px;'>No child actions&nbsp;<input id='action-"+iCard+"-"+idN+"' type='number' value='1' style='width:90px'/></p>"
@@ -196,18 +196,18 @@ function updateCondition(id,iCard,branch){
     if(branch=="y"){
         iActions=Math.ceil(Number(document.getElementById("action-"+iCard+"-"+id).value*(document.getElementById("con-"+iCard+"-"+id).value/100)))+1;
         iYes=iActions;   
-        iNo=aContainers.find(item => item.id === (id+1) && item.card==iCard && item.type=="condition").totalIterations; 
+        iNo=aContainers.find(item => item.id === (id+1) && item.card==iCard).totalIterations; 
         iId=id; 
     }else if(branch=="n"){
         iActions=Math.floor(Number(document.getElementById("action-"+iCard+"-"+id).value*(document.getElementById("con-"+iCard+"-"+id).value/100)));
-        iYes=aContainers.find(item => item.id === (id-1) && item.card==iCard && item.type=="condition").totalIterations;   
+        iYes=aContainers.find(item => item.id === (id-1) && item.card==iCard).totalIterations;   
         iNo=iActions; 
         iId=(id-1);
     } 
-    const updateItem=aContainers.find(item => item.id === id && item.card==iCard && item.type=="condition");  
+    const updateItem=aContainers.find(item => item.id === id && item.card==iCard);  
     Object.assign(updateItem,
         {
-            type:updateItem.type,
+            type:"condition",
             typeId:updateItem.type,
             id: id,
             iterations:updateItem.iterations,
