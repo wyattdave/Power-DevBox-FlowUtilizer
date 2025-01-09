@@ -5,6 +5,7 @@ const eTemplate=document.getElementById("card-0").cloneNode(true);
 const eAddLoop=document.getElementById("addLoop-button-1-0");
 const eAddCondition=document.getElementById("addCond-button-1-0");
 const eAddCard=document.getElementById("addFlow");
+const eFlowTable=document.getElementById("flow-table");
 
 let aContainers=[{
     type:"action",
@@ -19,8 +20,10 @@ let aContainers=[{
 let aCards=[{
     cardId:1,
     name:"Flow 1",
-    daily:1,
-    run:1
+    dailyAPI:1,
+    runAPI:1,
+    actions:1,
+    daily:1
 }];
 
 eAddCard.addEventListener("click", addCard);
@@ -30,7 +33,7 @@ document.getElementById("action-1-0").addEventListener('change',function () {upd
 document.getElementById("shrink-1").addEventListener('click',function () {shrinkCard(1)});
 document.getElementById("grow-1").addEventListener('click',function () {growCard(1)});
 document.getElementById("daily-1").addEventListener('click',function () {updateDaily(1)});
-document.getElementById("title-1").addEventListener('click',function () {updateCardTitle(1)});
+document.getElementById("title-1").addEventListener('input', (event) => {updateCardTitle(1)});
 
 function addCard(){
     iFlows++;
@@ -47,23 +50,40 @@ function addCard(){
     eNewCard.querySelector("#shrink-1").id="shrink-"+id;
     eNewCard.querySelector("#grow-1").id="grow-"+id;
     eNewCard.querySelector("#apis-1").id="apis-"+id;
+    eNewCard.querySelector("#runs-1").id="runs-"+id;
     eNewCard.querySelector("#action-1-0").id="action-"+id+"-0";
     eNewCard.querySelector("#addLoop-button-1-0").id="addLoop-button-"+id+"-0";
-    document.getElementById("action-"+id+"-0").addEventListener('change',function () {updateActions(id)});
+    eNewCard.querySelector("#addCond-button-1-0").id="addCond-button-"+id+"-0";
+    document.getElementById("action-"+id+"-0").addEventListener('change',function () {updateActions(0,id)});
     document.getElementById("shrink-"+id).addEventListener('click',function () {shrinkCard(id)});
     document.getElementById("grow-"+id).addEventListener('click',function () {growCard(id)});
     document.getElementById("addLoop-button-"+id+"-0").addEventListener("click", function () {addLoop(0,id)});  
+    document.getElementById("addCond-button-"+id+"-0").addEventListener("click", function () {addCon(0,id)});  
     document.getElementById("daily-"+id).addEventListener('click',function () {updateDaily(id)});
     document.getElementById("title-"+id).addEventListener('click',function () {updateCardTitle(id)});
 
+    aContainers.push(
+        {
+            type:"action",
+            id: aContainers.length+1,
+            iterations:1,
+            parent:0,
+            actions:1,
+            totalIterations:1,
+            card:id
+        }
+    );
     aCards.push(
         {
-            cardId:1,
-            name:"Flow "+iFlows,
-            daily:1,
-            run:1
+            cardId:iFlows,
+            name:"Flow "+id,
+            dailyAPI:1,
+            runAPI:1,
+            actions:1,
+            daily:1
         }
-    )
+    );
+    updateTable(iFlows);
 }
 
 function addLoop(iLoop,iCard){
@@ -101,6 +121,7 @@ function addLoop(iLoop,iCard){
             card:iCard
         }
     )  
+    totalAPIs(iCard);
 }
 
 function addCondition(iCon,iCard){
@@ -135,7 +156,7 @@ function addCondition(iCon,iCard){
     container.className="card border-black mb-3";
     container.innerHTML ="<p id='conTitle-"+iCard+"-"+idN+"' style='margin-left:"+(iCon*10)+
     "px;'>Condition "+iConCount+"</p><p style='margin-left:"+(iCon+1)*10+
-    "px;'>&No %&nbsp;<input id='con-"+iCard+"-"+idN+"' type='number' value='50' min='0' max='100' style='width:90px'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+idN+
+    "px;'>No %&nbsp;<input id='con-"+iCard+"-"+idN+"' type='number' value='50' min='0' max='100' style='width:90px'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+idN+
     "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+idN+
     "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button></p><p style='margin-left:"+(iCon+1)*10+
     "px;'>No child actions&nbsp;<input id='action-"+iCard+"-"+idN+"' type='number' value='1' style='width:90px'/></p>"
@@ -153,7 +174,7 @@ function addCondition(iCon,iCard){
             iterations:1,
             parent:iCon,
             actions:2,
-            totalIterations:1,
+            totalIterations:2,
             card:iCard
         },
         {
@@ -167,23 +188,26 @@ function addCondition(iCon,iCard){
             card:iCard
         }
     )  
+    totalAPIs(iCard);
 }
 
 function updateCardTitle(id){
-    const updateItem=aCards.find(item => item.id === id);  
+    const updateItem=aCards.find(item => item.cardId === id);  
+    const sTitle=document.getElementById("title-"+id).innerText;
     Object.assign(updateItem,
         {
-            cardId:updateItem.id,
+            cardId:id,
             name:sTitle,
-            daily:updateItem.daily,
-            run:updateItem.run
+            dailyAPI:updateItem.dailyAPI,
+            runAPI:updateItem.runAPI,
+            actions:updateItem.actions,
+            daily:updateItem.daily
         }
     )
-
+    updateTable(id);
 }
 
 function updateConTitle(id,iCard){
-    console.log(iCard,id)
     const sTitle=document.getElementById("conTitle-"+iCard+"-"+id).innerText;
     document.getElementById("conTitle-"+iCard+"-"+(id+1)).innerText=sTitle;
 }
@@ -233,41 +257,41 @@ function updateConditionPercent(id,iCard,branch){
         eNoPercentage=document.getElementById("con-"+iCard+"-"+(id+1));
         yId=id;
         nId=id+1;
-        eNoPercentage.value=100-eYesPercentage.value;
+        eNoPercentage.value=(100-eYesPercentage.value);
     }else if(branch=="n"){
         eYesPercentage=document.getElementById("con-"+iCard+"-"+(id-1));
         eNoPercentage=document.getElementById("con-"+iCard+"-"+id);
         yId=id-1;
         nId=id;
-        eYesPercentage.value=100-eNoPercentage.value;
+        eYesPercentage.value=(100-eNoPercentage.value);
     } 
 
-    if(eYesPercentage.value>100 || eNoPercentage.value<0){eYesPercentage.value=100;eNoPercentage.value=0}
-    if(eNoPercentage.value>100 || eYesPercentage.value<0){eNoPercentage.value=100;eYesPercentage.value=0}
-    const iYesActions= Math.ceil(document.getElementById("action-"+iCard+"-"+id).value*(eYesPercentage.value/100));
-    const iNoActions= Math.floor(document.getElementById("action-"+iCard+"-"+id).value*(eNoPercentage.value/100));
-    console.log(iYesActions,iNoActions,eYesPercentage.value,eNoPercentage.value)
-    const updateItem=aContainers.find(item => item.id === id && item.card==iCard && item.type=="condition");    
+    if(Number(eYesPercentage.value)>100 || eNoPercentage.value<0){eYesPercentage.value=100;eNoPercentage.value=0}
+    if(Number(eNoPercentage.value)>100 || eYesPercentage.value<0){eNoPercentage.value=100;eYesPercentage.value=0}
+    const iYesActions= Math.ceil(document.getElementById("action-"+iCard+"-"+id).value*(eYesPercentage.value)/100);
+    const iNoActions= Math.floor(document.getElementById("action-"+iCard+"-"+id).value*(eNoPercentage.value)/100);
+    console.log(iYesActions,iNoActions)
+    const updateItem=aContainers.find(item => item.id === yId);    
     Object.assign(updateItem,
         {
             type:updateItem.type,
             id: yId,
-            iterations:updateItem.iterations,
+            iterations:1,
             parent:updateItem.parent,
-            actions:iYesActions+iNoActions+1,
-            totalIterations:updateItem.iterations,
+            actions:iYesActions+1,
+            totalIterations:iYesActions+1,
             card:iCard
         }
     )
-    const updateItemN=aContainers.find(item => item.id === id && item.card==iCard && item.type=="condition");    
+    const updateItemN=aContainers.find(item => item.id === nId);    
     Object.assign(updateItemN,
         {
             type:updateItem.type,
             id: nId,
-            iterations:updateItem.iterations,
+            iterations:1,
             parent:updateItem.parent,
-            actions:iYesActions+iNoActions,
-            totalIterations:updateItem.iterations,
+            actions:iNoActions,
+            totalIterations:iNoActions,
             card:iCard
         }
     )
@@ -275,7 +299,7 @@ function updateConditionPercent(id,iCard,branch){
 }
 
 function updateActions(id,iCard){
-    const updateItem=aContainers.find(item => item.id === id && item.card==iCard);    
+    const updateItem=aContainers.find(item => item.id === id);    
     Object.assign(updateItem,
         {
             type:updateItem.type,
@@ -314,6 +338,40 @@ function updateDaily(iCard){
     document.getElementById("apis-"+iCard).innerText=iTotalAPIS*iDaily;
 }
 
+function updateTable(id){
+    const updateItem=aCards.find(item => item.cardId === id);  
+    const updatedData = aContainers.filter(item =>{return item.card==id})
+    let iTotalActions=0;
+    updatedData.forEach(item =>{
+        iTotalActions+=item.actions
+    })    
+    Object.assign(updateItem,
+        {
+            cardId:id,
+            name:updateItem.name,
+            dailyAPI:Number(document.getElementById("apis-"+id).innerText),
+            runAPI:Number(document.getElementById("runs-"+id).innerText),
+            actions:iTotalActions,
+            daily:Number(document.getElementById("daily-"+id).value)
+        }
+    )
+
+    let sHTML="<table class='table'><tr><th>Flow</th><th>Run API's</th><th>Daily API's</th><th>Actions</th><th>Daily Runs</th></tr>";
+    aCards.forEach(item =>{
+        const sRow="<tr><td>"+
+        item.name+"</td><td>"+
+        item.runAPI+"</td><td>"+
+        item.dailyAPI+"</td><td>"+
+        item.actions+"</td><td>"+
+        item.daily+"</td><tr>";
+        sHTML+=sRow;
+    })
+    sHTML+="</table>"
+    eFlowTable.innerHTML=sHTML;
+}
+
+
+
 function totalAPIs(iCard){
     const updatedData = aContainers.filter(item =>{return item.card==iCard})
     let iTotalAPIS=0;
@@ -321,6 +379,7 @@ function totalAPIs(iCard){
         iTotalAPIS+=(item.totalIterations*item.actions)
     })    
     document.getElementById("runs-"+iCard).innerText=iTotalAPIS; 
+    updateTable(iCard);
     return iTotalAPIS;
 }
 
