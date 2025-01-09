@@ -133,7 +133,7 @@ function addCondition(iCon,iCard){
     container.id="actions-div-"+iCard+"-"+id;
     container.className="card border-black mb-3";
     container.innerHTML ="<p style='margin-left:"+(iCon*10)+
-    "px;'><span id='conTitle-"+iCard+"-"+id+"' contenteditable='true'>Condition "+iConCount+"</span>&nbsp;&nbsp;<span id='conCalc-"+iCard+"-"+id+"'>Yes: 1, No:1</span><p style='margin-left:"+(iCon+1)*10+
+    "px;'><span id='conTitle-"+iCard+"-"+id+"' contenteditable='true'>Condition "+iConCount+"</span>&nbsp;&nbsp;<span id='conCalc-"+iCard+"-"+id+"'>Yes: 0.5, No:0.5, Condition:1</span><p style='margin-left:"+(iCon+1)*10+
     "px;'>Yes %&nbsp;<input id='con-"+iCard+"-"+id+"' type='number' value='50' min='0' max='100'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+id+
     "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+id+
     "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+id+
@@ -171,20 +171,20 @@ function addCondition(iCon,iCard){
             type:"condition",
             typeId: iConCount,
             id:id,
-            iterations:1,
+            iterations:0.5,
             parent:iCon,
-            actions:2,
-            totalIterations:2,
+            actions:1,
+            totalIterations:0.5,
             card:iCard
         },
         {
             type:"condition",
             typeId: iConCount,
             id:idN,
-            iterations:1,
+            iterations:0.5,
             parent:iCon,
             actions:1,
-            totalIterations:1,
+            totalIterations:0.5,
             card:iCard
         }
     )  
@@ -218,12 +218,12 @@ function updateCondition(id,iCard,branch){
     let iNo=0;
     let iId=0;
     if(branch=="y"){
-        iActions=Math.ceil(Number(document.getElementById("action-"+iCard+"-"+id).value*(document.getElementById("con-"+iCard+"-"+id).value/100)))+1;
+        iActions=Number(document.getElementById("action-"+iCard+"-"+id).value);
         iYes=iActions;   
         iNo=aContainers.find(item => item.id === (id+1) && item.card==iCard).totalIterations; 
         iId=id; 
     }else if(branch=="n"){
-        iActions=Math.floor(Number(document.getElementById("action-"+iCard+"-"+id).value*(document.getElementById("con-"+iCard+"-"+id).value/100)));
+        iActions=Number(document.getElementById("action-"+iCard+"-"+id).value);
         iYes=aContainers.find(item => item.id === (id-1) && item.card==iCard).totalIterations;   
         iNo=iActions; 
         iId=(id-1);
@@ -237,12 +237,12 @@ function updateCondition(id,iCard,branch){
             iterations:updateItem.iterations,
             parent:updateItem.parent,
             actions:Number(document.getElementById("action-"+iCard+"-"+id).value),
-            totalIterations:iActions,
+            totalIterations:updateItem.iterations,
             card:iCard
         }
     )
       
-    document.getElementById("conCalc-"+iCard+"-"+iId).innerText="Actions = Yes: "+iYes+", No:"+iNo;
+    document.getElementById("conCalc-"+iCard+"-"+iId).innerText="Actions = Yes: "+iYes+", No:"+iNo+", Condition:1";
     console.log(aContainers)
     updateDaily(iCard);
 }
@@ -268,18 +268,15 @@ function updateConditionPercent(id,iCard,branch){
 
     if(Number(eYesPercentage.value)>100 || eNoPercentage.value<0){eYesPercentage.value=100;eNoPercentage.value=0}
     if(Number(eNoPercentage.value)>100 || eYesPercentage.value<0){eNoPercentage.value=100;eYesPercentage.value=0}
-    const iYesActions= Math.ceil(document.getElementById("action-"+iCard+"-"+id).value*(eYesPercentage.value)/100);
-    const iNoActions= Math.floor(document.getElementById("action-"+iCard+"-"+id).value*(eNoPercentage.value)/100);
-    console.log(iYesActions,iNoActions)
     const updateItem=aContainers.find(item => item.id === yId);    
     Object.assign(updateItem,
         {
             type:updateItem.type,
             id: yId,
-            iterations:1,
+            iterations:eYesPercentage.value/100,
             parent:updateItem.parent,
-            actions:iYesActions+1,
-            totalIterations:iYesActions+1,
+            actions:Number(document.getElementById("action-"+iCard+"-"+idY).value),
+            totalIterations:eYesPercentage.value/100,
             card:iCard
         }
     )
@@ -288,10 +285,10 @@ function updateConditionPercent(id,iCard,branch){
         {
             type:updateItem.type,
             id: nId,
-            iterations:1,
+            iterations:eNoPercentage.value/100,
             parent:updateItem.parent,
-            actions:iNoActions,
-            totalIterations:iNoActions,
+            actions:Number(document.getElementById("action-"+iCard+"-"+idN).value),
+            totalIterations:eNoPercentage.value/100,
             card:iCard
         }
     )
@@ -336,7 +333,8 @@ function updateDaily(iCard){
     const iTotalAPIS=totalAPIs(iCard);
     const iDaily = Number(document.getElementById("daily-"+iCard).value);
     document.getElementById("apis-"+iCard).innerText=iTotalAPIS*iDaily;
-}
+    updateTable(iCard);
+;}
 
 function updateTable(id){
     const updateItem=aCards.find(item => item.cardId === id);  
@@ -378,6 +376,10 @@ function totalAPIs(iCard){
     updatedData.forEach(item =>{
         iTotalAPIS+=(item.totalIterations*item.actions)
     })    
+    const aConditions = aContainers.filter(item =>{return item.card==iCard && item.type=="condition"});
+    console.log(aConditions.length/2)
+    iTotalAPIS+=aConditions.length/2;
+
     document.getElementById("runs-"+iCard).innerText=iTotalAPIS; 
     updateTable(iCard);
     return iTotalAPIS;
