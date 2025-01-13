@@ -21,6 +21,10 @@
             font-size: 14px !important;
         }
 
+        input {
+            width:50px;
+        }
+
         .sm{
             padding: .25rem .5rem !important;
             font-size: .875rem !important;
@@ -46,9 +50,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarsFurni">
                 <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="https://powerdevbox.com/index.html">Power DevBox</a>
-                    </li>
+                    <li><a id="switch" class="nav-link" href="#">View My Solutions</a></li>
                     <li><a class="nav-link" href="https://docs.powerdevbox.com">Guide</a></li>
                     <li><a class="nav-link" href="https://powerdevbox.com/contact.html">Contact us</a></li>
                 </ul>
@@ -58,11 +60,11 @@
     </nav>
     <!-- End Header/Navigation -->
     <!-- Start Why Choose Us Section -->
-    <div>
+    <div id="main">
         <br>
         <div class="container-fluid" >
             <div class="row">
-                <div id="left-section" class="col-lg-6 col-md-8 col-sm-12" style="height:calc(100vh - (69px + 84px + 30px)); overflow:auto">
+                <div id="left-section" class="col-lg-6 col-md-8 col-sm-12" style="max-height:calc(100vh - (69px + 84px + 30px)); overflow:auto">
                     <div id="card-0">
                         <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
                             <div class="card-body">
@@ -92,8 +94,8 @@
                 <div id="right-section" class="col-lg-6 col-md-4">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title" contenteditable="true">Solution Name</h4>
-                            <h6 class="card-subtitle mb-2 text-muted">Flow Count: <span id="flow-count">1</span><Button type="button" class="btn btn-dark sm" id="addFlow" style="margin-left:20px"><i class="fa-solid fa-plus"></i></Button></h6>
+                            <h4 class="card-title" contenteditable="true" id="solutionTable">Solution Name</h4>
+                            <h6 class="card-subtitle mb-2 text-muted">Flow Count: <span id="flow-count">1</span><Button type="button" class="btn btn-dark sm" id="addFlow" style="margin-left:20px"><i class="fa-solid fa-plus"></i></Button><Button type="button" class="btn btn-dark sm" style="margin-left:20px" id="addSolution">Save Solution</Button></h6>
                             <h6 class="card-subtitle mb-2 text-muted">Total Daily API: 1</h6>
                             <div id="flow-table">
                                 <table class="table">
@@ -110,7 +112,39 @@
                 </div>    
             </div>
         </div>
-
+    </div>
+    <div id="solutions" style="display:none;">
+        <br>
+        <div class="container-fluid" >
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12" style="max-height:calc(100vh - (69px + 84px + 30px)); overflow:auto">
+                    <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
+                        <div class="card-body" >
+                            <h4 class="card-title" id="totals-title">Total API's</h4>
+                            <div  id="left-totals"></div>
+                        </div>
+                    </div>
+                    <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
+                        <div class="card-body" >
+                            <h4 class="card-title" id="solutionTable-title">Solutions</h4>
+                            <div  id="left-table"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-12" >
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title" id="solutionFlowTable-title">Flows&nbsp;&nbsp;
+                                <Button type="button" class="btn btn-dark sm" id="clear-filter" style="margin-left:20px">
+                                    <i class="fa-solid fa-filter-circle-xmark"></i>
+                                </Button>
+                            </h4>
+                            <div id="right-table" ></div>
+                        </div>  
+                    </div>
+                </div>    
+            </div>
+        </div>
     </div>
     <!-- End Why Choose Us Section -->
     <!-- Start Footer Section -->
