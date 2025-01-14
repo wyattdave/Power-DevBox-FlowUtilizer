@@ -16,6 +16,7 @@ const eSaveSolution=document.getElementById("addSolution");
 const eSwitch=document.getElementById("switch");
 const eMain=document.getElementById("main");
 const eSolution=document.getElementById("solutions");
+const eSolutionDaily=document.getElementById("solution-daily");
 
 let aContainers=[{
     type:"action",
@@ -42,12 +43,13 @@ let aCards=[{
 eAddCard.addEventListener("click", addCard);
 eSwitch.addEventListener("click", switchMode);
 eAddLoop.addEventListener("click", function () {addLoop(0,1)});
+eAddCondition.addEventListener("click", function () {addCondition(0,1)});
 eSolutionTitle.addEventListener('input', (event) => {updateTable(iCurrentCard)});
 eSaveSolution.addEventListener('click',function () {saveSolution()});
 document.getElementById("action-1-0").addEventListener('change',function () {updateActions(0,1)});
 document.getElementById("shrink-1").addEventListener('click',function () {shrinkCard(1)});
 document.getElementById("grow-1").addEventListener('click',function () {growCard(1)});
-document.getElementById("daily-1").addEventListener('click',function () {updateDaily(1)});
+document.getElementById("daily-1").addEventListener('change',function () {updateDaily(1)});
 document.getElementById("title-1").addEventListener('input', (event) => {updateCardTitle(1)});
 document.getElementById("clear-filter").addEventListener('click',function () {updateSolutionTable("all")});
 
@@ -378,7 +380,7 @@ function updateConditionPercent(id,iCard,branch){
             id: yId,
             iterations:eYesPercentage.value/100,
             parent:updateItem.parent,
-            actions:Number(document.getElementById("action-"+iCard+"-"+idY).value),
+            actions:Number(document.getElementById("action-"+iCard+"-"+yId).value),
             totalIterations:eYesPercentage.value/100,
             card:iCard
         }
@@ -390,7 +392,7 @@ function updateConditionPercent(id,iCard,branch){
             id: nId,
             iterations:eNoPercentage.value/100,
             parent:updateItem.parent,
-            actions:Number(document.getElementById("action-"+iCard+"-"+idN).value),
+            actions:Number(document.getElementById("action-"+iCard+"-"+nId).value),
             totalIterations:eNoPercentage.value/100,
             card:iCard
         }
@@ -436,6 +438,7 @@ function updateDaily(iCard){
     const iTotalAPIS=totalAPIs(iCard);
     const iDaily = Number(document.getElementById("daily-"+iCard).value);
     document.getElementById("apis-"+iCard).innerText=iTotalAPIS*iDaily;
+ 
     updateTable(iCard);
 ;}
 
@@ -471,6 +474,7 @@ function updateTable(id){
     })
     sHTML+="</table>"
     eFlowTable.innerHTML=sHTML;
+    eSolutionDaily.innerText="Total Daily API: "+aCards.reduce((sum, item) => sum + item.dailyAPI, 0)
 }
 
 function totalAPIs(iCard){
@@ -484,6 +488,7 @@ function totalAPIs(iCard){
 
     document.getElementById("runs-"+iCard).innerText=iTotalAPIS; 
     updateTable(iCard);
+
     return iTotalAPIS;
 }
 
