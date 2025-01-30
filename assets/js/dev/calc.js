@@ -17,6 +17,7 @@ const eSwitch=document.getElementById("switch");
 const eMain=document.getElementById("main");
 const eSolution=document.getElementById("solutions");
 const eSolutionDaily=document.getElementById("solution-daily");
+const eleftSection=document.getElementById("left-section");
 
 let aContainers=[{
     type:"action",
@@ -37,10 +38,11 @@ let aCards=[{
     daily:1,
     solution:"Solution Name",
     on:true,
-    guid:createGuid()
+    guid:createGuid(),
+    containers:aContainers.slice()
 }];
 
-eAddCard.addEventListener("click", addCard);
+eAddCard.addEventListener("click", function () {addCard(-1)});
 eSwitch.addEventListener("click", switchMode);
 eAddLoop.addEventListener("click", function () {addLoop(0,1)});
 eAddCondition.addEventListener("click", function () {addCondition(0,1)});
@@ -74,15 +76,21 @@ function switchMode(){
     }
 }
 
-function addCard(){
-    iFlows++;
-    const id=iFlows;
+function addCard(id){
+   
+    if(id==-1){
+        iFlows++;
+        id=iFlows;
+        closeOtherCards(id);
+    }else{
+        iFlows=id
+    }
+    
     document.getElementById("flow-count").innerText=id;
     const eNewCard=eTemplate.cloneNode(true);
 
-    document.getElementById("left-section").appendChild(eNewCard);
-    eNewCard.id="card-"+id;
-    closeOtherCards(id);
+    eleftSection.appendChild(eNewCard);
+    eNewCard.id="card-"+id;    
     eNewCard.querySelector("#actions-div-1-0").id="actions-div-"+id+"-0";  
     eNewCard.querySelector("#title-1").innerText="Flow "+id;
     eNewCard.querySelector("#title-1").id="title-"+id;    
@@ -123,7 +131,8 @@ function addCard(){
             daily:1,
             solution:eSolutionTitle.innerText,
             on:true,
-            guid:createGuid()
+            guid:createGuid(),
+            containers:aContainers.filter(item => item.card==iFlows).slice()
         }
     );
     updateTable(iFlows);
@@ -131,7 +140,7 @@ function addCard(){
 
 function addLoop(iLoop,iCard){
     const iLoopCount=aContainers.filter(item => item.type === "loop" && item.card==iCard).length+1;   
-    const id=aContainers.length+1
+    const id=aContainers.length;
     const container = document.createElement("div");
     container.style.marginLeft = "10px";
     container.style.marginRight = "2px";
@@ -144,7 +153,7 @@ function addLoop(iLoop,iCard){
     "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+id+
     "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iLoop+1)*10+
     "px;'>Child actions:<input id='action-"+iCard+"-"+id+"' type='number' value='1'/></p>"
-
+console.log(iCard,iLoop)
     document.getElementById("actions-div-"+iCard+"-"+iLoop).appendChild(container);
     console.log("addLoop-button-"+iCard+"-"+iLoopCount)
     document.getElementById("addLoop-button-"+iCard+"-"+id).addEventListener('click',function () {addLoop(id,iCard)});
@@ -165,11 +174,12 @@ function addLoop(iLoop,iCard){
         }
     )  
     totalAPIs(iCard);
+    updateDaily(iCard);
 }
 
 function addCondition(iCon,iCard){
     const iConCount=aContainers.filter(item => item.type === "condition" && item.card==iCard).length+1;
-    let id=aContainers.length+1;
+    let id=aContainers.length;
     let container = document.createElement("div");
     container.style.marginLeft = "10px";
     container.style.marginRight = "2px";
@@ -232,6 +242,7 @@ function addCondition(iCon,iCard){
         }
     )  
     totalAPIs(iCard);
+    updateDaily(iCard);
 }
 
 function updateSolutionTable(sFilter){
@@ -269,10 +280,14 @@ function updateSolutionTable(sFilter){
         document.getElementById("delete-solution-"+sol.solutionId).addEventListener('click', function () {           
             deleteSolution(sol.solutionId);
         })
+        document.getElementById("solution-"+sol.solutionId).addEventListener('click', function () {           
+            loadSolution(sol.solutionId);
+        })
         if(sol.solutionId==sFilter || sFilter=="all"){
             sol.flows.forEach(flow =>{
                 document.getElementById("flow-"+flow.guid).addEventListener('change', function () {
-                    flow.on=this.checked;                   
+                    flow.on=this.checked;  
+                    updateTotals();                 
                 });             
                 aRunningFlows.push(flow)
             })
@@ -282,8 +297,9 @@ function updateSolutionTable(sFilter){
 }
 
 function updateTotals(){
-    let sHTML="<p>Total Daily Runs:"+aRunningFlows.reduce((sum, item) => sum + item.dailyAPI, 0)+
-    "</p><p>Running Flows:"+aRunningFlows.length+"</p>"
+    const aFilteredFlows=aRunningFlows.filter(item => item.on)
+    let sHTML="<p>Total Daily Runs:"+aFilteredFlows.reduce((sum, item) => sum + item.dailyAPI, 0)+
+    "</p><p>Running Flows:"+aFilteredFlows.length+"</p>"
     document.getElementById("left-totals").innerHTML=sHTML;
 }
 
@@ -306,7 +322,8 @@ function updateCardTitle(id){
             daily:updateItem.daily,
             solutionId:updateItem.solution,
             on:true,
-            guid:createGuid()
+            guid:createGuid(),
+            containers:updateItem.containers
         }
     )
     updateTable(id);
@@ -417,6 +434,25 @@ function updateActions(id,iCard){
     updateDaily(iCard);
 }
 
+function updateCard(id){
+    const aCardContainers=aContainers.filter(item => item.card)  
+    const updateItem=aCards.find(item => item.cardId === id);  
+    Object.assign(updateItem,
+        {
+            cardId:updateItem.cardId,
+            name:updateItem.name,
+            dailyAPI:updateItem.dailyAPI,
+            runAPI:updateItem.runAPI,
+            actions:updateItem.actions,
+            daily:updateItem.daily,
+            solution:updateItem.solution,
+            on:updateItem.on,
+            guid:updateItem.guid,
+            containers:aCardContainers
+        }
+    )
+}
+
 function updateIterations(id,iCard){
     const updateItem=aContainers.find(item => item.id === id && item.card==iCard);    
     Object.assign(updateItem,
@@ -438,7 +474,7 @@ function updateDaily(iCard){
     const iTotalAPIS=totalAPIs(iCard);
     const iDaily = Number(document.getElementById("daily-"+iCard).value);
     document.getElementById("apis-"+iCard).innerText=iTotalAPIS*iDaily;
- 
+    updateCard(iCard);
     updateTable(iCard);
 ;}
 
@@ -474,8 +510,35 @@ function updateTable(id){
     })
     sHTML+="</table>"
     eFlowTable.innerHTML=sHTML;
-    eSolutionDaily.innerText="Total Daily API: "+aCards.reduce((sum, item) => sum + item.dailyAPI, 0)
+    eSolutionDaily.innerText="Total Daily API: "+aCards.reduce((sum, item) => sum + item.dailyAPI, 0);
+    
 }
+
+function loadSolution(id){
+    const oSolution=aSolutions.find(item =>{return item.solutionId==id});
+    aCards=oSolution.flows;
+    aContainers.length=0;
+    console.log(oSolution)
+    eleftSection.innerHTML="";
+    aCards.forEach(card => {
+        addCard(card.cardId);
+        card.containers.forEach(item =>{
+            console.log(item)
+            switch(item.type){
+                case "loop":
+                    addLoop(item.parent,card.cardId)
+                    break;
+                case "condition":
+                    addCondition(item.parent,card.cardId)
+                    break
+            }
+                
+        })
+    })
+    switchMode();
+
+}
+
 
 function totalAPIs(iCard){
     const updatedData = aContainers.filter(item =>{return item.card==iCard})
@@ -520,7 +583,6 @@ function deleteCondition(id,iCard){
     deleteContainer((id+1),iCard);
 }
 
-
 function deleteContainer(id,iCard){
     document.getElementById("actions-div-"+iCard+"-"+id).remove();
     getChildAndDelete(id,iCard);
@@ -534,8 +596,7 @@ function getChildAndDelete(id,iCard){
     })
 }
 
-function shrinkCard(id) {
-    
+function shrinkCard(id) {   
     document.getElementById("shrink-"+id).style.display = "none";
     document.getElementById("grow-"+id).style.display = "";
     const actionsDiv = document.getElementById("actions-div-"+id+"-0");
@@ -578,7 +639,6 @@ function onTransitionEnd(event) {
 
 function saveSolution(){
     const updateItem=aSolutions.find(item => item.solutionId==sSolution);
-    console.log(getNow())
     if(updateItem){
         Object.assign(updateItem,
             {
@@ -594,7 +654,7 @@ function saveSolution(){
         aSolutions.push({
             solutionName:eSolutionTitle.innerText,
             solutionId:sSolution,
-            flows:aCards,
+            flows:aCards.slice(),
             dailyAPI:aCards.reduce((sum, item) => sum + item.dailyAPI, 0),
             modified:getNow()
         });
