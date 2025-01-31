@@ -13,6 +13,7 @@ const eAddCard=document.getElementById("addFlow");
 const eFlowTable=document.getElementById("flow-table");
 const eSolutionTitle=document.getElementById("solutionTable");
 const eSaveSolution=document.getElementById("addSolution");
+const eNewSolution=document.getElementById("newSolution");
 const eSwitch=document.getElementById("switch");
 const eMain=document.getElementById("main");
 const eSolution=document.getElementById("solutions");
@@ -48,7 +49,8 @@ eAddLoop.addEventListener("click", function () {addLoop(0,1)});
 eAddCondition.addEventListener("click", function () {addCondition(0,1)});
 eSolutionTitle.addEventListener('input', (event) => {updateTable(iCurrentCard)});
 eSaveSolution.addEventListener('click',function () {saveSolution()});
-document.getElementById("action-1-0").addEventListener('change',function () {updateActions(0,1)});
+eNewSolution.addEventListener('click',function () {newSolution()});
+document.getElementById("action-1").addEventListener('change',function () {updateActions(0,1,true)});
 document.getElementById("shrink-1").addEventListener('click',function () {shrinkCard(1)});
 document.getElementById("grow-1").addEventListener('click',function () {growCard(1)});
 document.getElementById("daily-1").addEventListener('change',function () {updateDaily(1)});
@@ -66,24 +68,25 @@ function switchMode(){
         updateSolutionTable("all");
         eMain.style.display="none";
         eSolution.style.display="block";
-        eSwitch.innerText=="View Solution";
+        eSwitch.innerText="View Flows";
         mode="solution";
     }else{
         eSolution.style.display="none";
         eMain.style.display="block";        
-        eSwitch.innerText=="View My Solutions";
+        eSwitch.innerText="View Solutions";
         mode="main";
     }
 }
 
 function addCard(id){
-   
+    let bNew=true;
     if(id==-1){
         iFlows++;
         id=iFlows;
         closeOtherCards(id);
     }else{
-        iFlows=id
+        iFlows=id;
+        bNew=false;
     }
     
     document.getElementById("flow-count").innerText=id;
@@ -99,10 +102,10 @@ function addCard(id){
     eNewCard.querySelector("#grow-1").id="grow-"+id;
     eNewCard.querySelector("#apis-1").id="apis-"+id;
     eNewCard.querySelector("#runs-1").id="runs-"+id;
-    eNewCard.querySelector("#action-1-0").id="action-"+id+"-0";
+    eNewCard.querySelector("#action-1").id="action-"+id;
     eNewCard.querySelector("#addLoop-button-1-0").id="addLoop-button-"+id+"-0";
     eNewCard.querySelector("#addCond-button-1-0").id="addCond-button-"+id+"-0";
-    document.getElementById("action-"+id+"-0").addEventListener('change',function () {updateActions(0,id)});
+    document.getElementById("action-"+id).addEventListener('change',function () {updateActions(0,id,true)});
     document.getElementById("shrink-"+id).addEventListener('click',function () {shrinkCard(id)});
     document.getElementById("grow-"+id).addEventListener('click',function () {growCard(id)});
     document.getElementById("addLoop-button-"+id+"-0").addEventListener("click", function () {addLoop(0,id)});  
@@ -110,31 +113,33 @@ function addCard(id){
     document.getElementById("daily-"+id).addEventListener('click',function () {updateDaily(id)});
     document.getElementById("title-"+id).addEventListener('click',function () {updateCardTitle(id)});
 
-    aContainers.push(
-        {
-            type:"action",
-            id: aContainers.length+1,
-            iterations:1,
-            parent:0,
-            actions:1,
-            totalIterations:1,
-            card:id
-        }
-    );
-    aCards.push(
-        {
-            cardId:iFlows,
-            name:"Flow "+id,
-            dailyAPI:1,
-            runAPI:1,
-            actions:1,
-            daily:1,
-            solution:eSolutionTitle.innerText,
-            on:true,
-            guid:createGuid(),
-            containers:aContainers.filter(item => item.card==iFlows).slice()
-        }
-    );
+    if(bNew){
+        aContainers.push(
+            {
+                type:"action",
+                id: aContainers.length+1,
+                iterations:1,
+                parent:0,
+                actions:1,
+                totalIterations:1,
+                card:id
+            }
+        );
+        aCards.push(
+            {
+                cardId:iFlows,
+                name:"Flow "+id,
+                dailyAPI:1,
+                runAPI:1,
+                actions:1,
+                daily:1,
+                solution:eSolutionTitle.innerText,
+                on:true,
+                guid:createGuid(),
+                containers:aContainers.filter(item => item.card==iFlows).slice()
+            }
+        );
+    }
     updateTable(iFlows);
 }
 
@@ -160,7 +165,7 @@ console.log(iCard,iLoop)
     document.getElementById("addCon-button-"+iCard+"-"+id).addEventListener('click',function () {addCondition(id,iCard)});
     document.getElementById("delete-button-"+iCard+"-"+id).addEventListener('click',function () {deleteContainer(id,iCard)});
     document.getElementById("loop-"+iCard+"-"+id).addEventListener('change',function () {updateIterations(id,iCard)});
-    document.getElementById("action-"+iCard+"-"+id).addEventListener('change',function () {updateActions(id,iCard)});
+    document.getElementById("action-"+iCard+"-"+id).addEventListener('change',function () {updateActions(id,iCard,false)});
     aContainers.push(
         {
             type:"loop",
@@ -417,8 +422,14 @@ function updateConditionPercent(id,iCard,branch){
     updateDaily(iCard);
 }
 
-function updateActions(id,iCard){
+function updateActions(id,iCard,root){
     const updateItem=aContainers.find(item => item.id === id);    
+    let iActions=0;
+    if(root){
+        iActions=Number(document.getElementById("action-"+iCard).value)
+    }else{
+        iActions=Number(document.getElementById("action-"+iCard+"-"+id).value)
+    }
     Object.assign(updateItem,
         {
             type:updateItem.type,
@@ -426,7 +437,7 @@ function updateActions(id,iCard){
             id: id,
             iterations:updateItem.iterations,
             parent:updateItem.parent,
-            actions:Number(document.getElementById("action-"+iCard+"-"+id).value),
+            actions:iActions,
             totalIterations:updateItem.iterations,
             card:iCard
         }
@@ -435,7 +446,6 @@ function updateActions(id,iCard){
 }
 
 function updateCard(id){
-    const aCardContainers=aContainers.filter(item => item.card)  
     const updateItem=aCards.find(item => item.cardId === id);  
     Object.assign(updateItem,
         {
@@ -448,7 +458,7 @@ function updateCard(id){
             solution:updateItem.solution,
             on:updateItem.on,
             guid:updateItem.guid,
-            containers:aCardContainers
+            containers:aContainers.filter(item => item.card==id)  
         }
     )
 }
@@ -495,7 +505,8 @@ function updateTable(id){
             daily:Number(document.getElementById("daily-"+id).value),
             solution:eSolutionTitle.innerText,
             on:true,
-            guid:createGuid()
+            guid:createGuid(),
+            containers:updateItem.containers
         }
     )
     let sHTML="<table class='table'><tr><th>Flow</th><th>Run API's</th><th>Daily API's</th><th>Actions</th><th>Daily Runs</th></tr>";
@@ -515,11 +526,12 @@ function updateTable(id){
 }
 
 function loadSolution(id){
+
     const oSolution=aSolutions.find(item =>{return item.solutionId==id});
+    sSolution=oSolution.solutionId;
     aCards=oSolution.flows;
-    aContainers.length=0;
-    console.log(oSolution)
-    eleftSection.innerHTML="";
+    aContainers.length=0;    
+    eleftSection.innerHTML="";   
     aCards.forEach(card => {
         addCard(card.cardId);
         card.containers.forEach(item =>{
@@ -535,10 +547,9 @@ function loadSolution(id){
                 
         })
     })
+    closeOtherCards(1);
     switchMode();
-
 }
-
 
 function totalAPIs(iCard){
     const updatedData = aContainers.filter(item =>{return item.card==iCard})
@@ -574,7 +585,6 @@ function updateTotalIterations(data) {
         }
         }
     });
-
   return data;
 }
 
@@ -644,7 +654,7 @@ function saveSolution(){
             {
                 solutionName:eSolutionTitle.innerText,
                 solutionId:sSolution,
-                flows:aCards,
+                flows:aCards.slice(),
                 dailyAPI:aCards.reduce((sum, item) => sum + item.dailyAPI, 0),
                 modified:getNow()
             }
@@ -661,6 +671,35 @@ function saveSolution(){
         alert(eSolutionTitle.innerText+" created")
     }
     localStorage.setItem("solutions",JSON.stringify(aSolutions));
+}
+
+function newSolution(){
+    aContainers=[{
+        type:"action",
+        id: 0,
+        iterations:1,
+        parent:0,
+        actions:1,
+        totalIterations:1,
+        card:1
+    }];
+    
+    aCards=[{
+        cardId:1,
+        name:"Flow 1",
+        dailyAPI:1,
+        runAPI:1,
+        actions:1,
+        daily:1,
+        solution:"Solution Name",
+        on:true,
+        guid:createGuid(),
+        containers:aContainers.slice()
+    }];
+    iFlows=1;
+    eleftSection.innerHTML="";
+    addCard(1)
+
 }
 
 function createGuid(){

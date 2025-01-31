@@ -55,9 +55,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarsFurni">
                 <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-                    <li><a id="switch" class="nav-link" href="#">View My Solutions</a></li>
-                    <li><a class="nav-link" href="https://docs.powerdevbox.com">Guide</a></li>
-                    <li><a class="nav-link" href="https://powerdevbox.com/contact.html">Contact us</a></li>
+                    <li><a id="switch" class="nav-link" href="#">View Solutions</a></li>
+                    <li><a class="nav-link" href="https://docs.powerdevbox.com" target="_blank">Guide</a></li>
+                    <li><a class="nav-link" href="https://powerdevbox.com/contact.html" target="_blank">Contact us</a></li>
                 </ul>
             </div>
         </div>				
@@ -88,7 +88,7 @@
                                 </div>
                                 <hr>
                                 <h6 class="card-subtitle mb-2 text-muted">Run Details</h6>
-                                Top level actions: <input id="action-1-0" type="number" value="1"></input>
+                                Top level actions: <input id="action-1" type="number" value="1"></input>
                                 <button type="button" class="btn btn-dark sm" id="addLoop-button-1-0"><i class="fa-solid fa-retweet"></i> Add Loop</button>
                                 <button type="button" class="btn btn-dark sm" id="addCond-button-1-0"><i class="fa-solid fa-arrow-right-arrow-left"></i> Add Condition</button>
                             </div>
@@ -99,7 +99,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title" contenteditable="true" id="solutionTable">Solution Name</h4>
-                            <h6 class="card-subtitle mb-2 text-muted">Flow Count: <span id="flow-count">1</span><Button type="button" class="btn btn-dark sm" id="addFlow" style="margin-left:20px"><i class="fa-solid fa-plus"></i></Button><Button type="button" class="btn btn-dark sm" style="margin-left:20px" id="addSolution">Save Solution</Button></h6>
+                            <h6 class="card-subtitle mb-2 text-muted">Flow Count: <span id="flow-count">1</span><Button type="button" class="btn btn-dark sm" id="addFlow" style="margin-left:20px">Add Flow</Button><Button type="button" class="btn btn-dark sm" style="margin-left:20px" id="addSolution">Save Solution</Button><Button type="button" class="btn btn-dark sm" style="margin-left:20px" id="newSolution">New Solution</Button></h6>
                             <h6 class="card-subtitle mb-2 text-muted" id="solution-daily">Total Daily API: 1</h6>
                             <div id="flow-table">
                                 <table class="table">
@@ -121,7 +121,7 @@
         <br>
         <div class="container-fluid" >
             <div class="row">
-                <div class="col-lg-4 col-md-12 col-sm-12 panelAutoHeight" style="overflow:auto">
+                <div class="col-lg-5 col-md-12 col-sm-12 panelAutoHeight" style="overflow:auto">
                     <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
                         <div class="card-body" >
                             <h4 class="card-title" id="totals-title">Total API's</h4>
@@ -135,7 +135,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-8 col-md-12 col-sm-12" >
+                <div class="col-lg-7 col-md-12 col-sm-12" >
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title" id="solutionFlowTable-title">Flows&nbsp;&nbsp;
