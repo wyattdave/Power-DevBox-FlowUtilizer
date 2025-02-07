@@ -25,6 +25,11 @@
             width:50px;
         }
 
+        button{
+        
+            margin-right: 10px !important;
+        }
+
         .sm{
             padding: .25rem .5rem !important;
             font-size: .875rem !important;
@@ -33,6 +38,14 @@
         .panelAutoHeight{          
                 height:calc(100vh - (69px + 84px + 30px)); 
             }
+        }
+        .sideways{
+            display:flex;
+            flex-direction: row;
+ 
+        }
+        input[type="checkbox"]{
+            width:20px;
         }
 
     </style>
@@ -87,7 +100,16 @@
                                     </div>
                                 </div>
                                 <hr>
-                                <h6 class="card-subtitle mb-2 text-muted">Run Details</h6>
+                                <div class="sideways">
+                                    <label><input type="checkbox" name="days-1" value="su" checked> Sun</label><br>  
+                                    <label><input type="checkbox" name="days-1" value="mu" checked> Mon</label><br>
+                                    <label><input type="checkbox" name="days-1" value="tu" checked> Tue</label><br>
+                                    <label><input type="checkbox" name="days-1" value="we" checked> Wed</label><br>
+                                    <label><input type="checkbox" name="days-1" value="th" checked> Thu</label><br>
+                                    <label><input type="checkbox" name="days-1" value="fr" checked> Fri</label><br>
+                                    <label><input type="checkbox" name="days-1" value="sa" checked> Sat</label><br>                                          
+                                </div>  
+                                <h6 class="card-subtitle mb-2 text-muted">Run Details</h6>                                
                                 Top level actions: <input id="action-1" type="number" value="1"></input>
                                 <button type="button" class="btn btn-dark sm" id="addLoop-button-1-0"><i class="fa-solid fa-retweet"></i> Add Loop</button>
                                 <button type="button" class="btn btn-dark sm" id="addCond-button-1-0"><i class="fa-solid fa-arrow-right-arrow-left"></i> Add Condition</button>
@@ -98,16 +120,22 @@
                 <div id="right-section" class="col-lg-6 col-md-12 col-sm-12">
                     <div class="card">
                         <div class="card-body">
+                            <div class="sideways">
+                                <Button type="button" class="btn btn-dark sm" id="addFlow">Add Flow</Button>
+                                <Button type="button" class="btn btn-dark sm" id="addSolution">Save Solution</Button>
+                                <Button type="button" class="btn btn-dark sm" id="newSolution">New Solution</Button>
+                                <Button type="button" class="btn btn-dark sm" id="downloadYAML">Download Solution</Button>
+                            </div>
                             <h4 class="card-title" contenteditable="true" id="solutionTable">Solution Name</h4>
-                            <h6 class="card-subtitle mb-2 text-muted">Flow Count: <span id="flow-count">1</span><Button type="button" class="btn btn-dark sm" id="addFlow" style="margin-left:20px">Add Flow</Button><Button type="button" class="btn btn-dark sm" style="margin-left:20px" id="addSolution">Save Solution</Button><Button type="button" class="btn btn-dark sm" style="margin-left:20px" id="newSolution">New Solution</Button></h6>
+                            <h6 class="card-subtitle mb-2 text-muted">Flow Count: <span id="flow-count">1</span></h6>
                             <h6 class="card-subtitle mb-2 text-muted" id="solution-daily">Total Daily API: 1</h6>
                             <div id="flow-table">
                                 <table class="table">
                                     <tr>
-                                        <th>Flow</th><th>Run API's</th><th>Daily API's</th><th>Actions</th><th>Daily Runs</th>
+                                        <th>Flow</th><th>Run API's</th><th>Daily API's</th><th>Actions</th><th>Daily Runs</th><th>Days</th>
                                     </tr>
                                     <tr>
-                                        <td>Flow 1</td><td>1</td><td>1</td><td>1</td><td>1</td>
+                                        <td>Flow 1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>su|mo|tu|we|th|fr|sa</td>
                                     </tr>
                                 </table>
                             </div>
@@ -173,6 +201,7 @@
     <script src="js/tiny-slider.js"></script>
     <script src="js/custom.js"></script>
     <script type="text/javascript" src="assets/js/dev/calc.js"></script>
+    <script type="text/javascript" src="assets/js/dev/ymal converter.js"></script>
     <script>
         if('serviceWorker' in navigator) {
         
