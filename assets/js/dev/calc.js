@@ -1,14 +1,15 @@
 let iElementAutoHeight=0
 let iFlows=1;
-let iCurrentCard=1;
+let iCurrentCard=0;
 let aSolutions=[];
 let sSolution=createGuid();
 let mode="main";
 let aRunningFlows=[];
+let sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
 
 const eTemplate=document.getElementById("card-0").cloneNode(true);
-const eAddLoop=document.getElementById("addLoop-button-1-0");
-const eAddCondition=document.getElementById("addCond-button-1-0");
+const eAddLoop=document.getElementById("addLoop-button-0-0");
+const eAddCondition=document.getElementById("addCond-button-0-0");
 const eAddCard=document.getElementById("addFlow");
 const eFlowTable=document.getElementById("flow-table");
 const eSolutionTitle=document.getElementById("solutionTable");
@@ -27,11 +28,12 @@ let aContainers=[{
     parent:0,
     actions:1,
     totalIterations:1,
-    card:1
+    branch:"n/a",
+    flow:0
 }];
 
 let aCards=[{
-    cardId:1,
+    flowId:0,
     name:"Flow 1",
     dailyAPI:1,
     runAPI:1,
@@ -46,24 +48,25 @@ let aCards=[{
 
 eAddCard.addEventListener("click", function () {addCard(-1)});
 eSwitch.addEventListener("click", switchMode);
-eAddLoop.addEventListener("click", function () {addLoop(0,1)});
-eAddCondition.addEventListener("click", function () {addCondition(0,1)});
+eAddLoop.addEventListener("click", function () {addLoop(0,0)});
+eAddCondition.addEventListener("click", function () {addCondition(0,0)});
 eSolutionTitle.addEventListener('input', (event) => {updateTable(iCurrentCard)});
 eSaveSolution.addEventListener('click',function () {saveSolution()});
 eNewSolution.addEventListener('click',function () {newSolution()});
 document.getElementById("downloadYAML").addEventListener("click", downloadYaml);
-document.getElementById("action-1").addEventListener('change',function () {updateActions(0,1,true)});
-document.getElementById("shrink-1").addEventListener('click',function () {shrinkCard(1)});
-document.getElementById("grow-1").addEventListener('click',function () {growCard(1)});
-document.getElementById("daily-1").addEventListener('change',function () {updateDaily(1)});
-document.getElementById("title-1").addEventListener('input', (event) => {updateCardTitle(1)});
+document.getElementById("action-0").addEventListener('change',function () {updateActions(0,0,true)});
+document.getElementById("delete-button-card-0").addEventListener('click',function () {deleteCard(0)});
+document.getElementById("shrink-0").addEventListener('click',function () {shrinkCard(0)});
+document.getElementById("grow-0").addEventListener('click',function () {growCard(0)});
+document.getElementById("daily-0").addEventListener('change',function () {updateDaily(0)});
+document.getElementById("title-0").addEventListener('input', (event) => {updateCardTitle(0)});
 document.getElementById("clear-filter").addEventListener('click',function () {updateSolutionTable("all")});
-const aDaysOfWeek = document.querySelectorAll("input[name='days-1']");
-aDaysOfWeek.forEach( item =>{
+document.getElementById("close-filter-days").addEventListener('click',closePopup)
+const aDaysOfWeekChecks = document.querySelectorAll("input[name='days-1']");
+aDaysOfWeekChecks.forEach( item =>{
     item.addEventListener('change',function () {updateCard(1)});
 })
-
-
+const aDaysOfWeekChecksFilter = document.querySelectorAll("input[name='-filter']");
 
 if(!localStorage.getItem("solutions")){
     localStorage.setItem("solutions","[]");
@@ -90,7 +93,7 @@ function addCard(id){
     let bNew=true;
     if(id==-1){
         iFlows++;
-        id=iFlows;
+        id=createGuid();
         closeOtherCards(id);
     }else{
         iFlows=id;
@@ -102,18 +105,18 @@ function addCard(id){
 
     eleftSection.appendChild(eNewCard);
     eNewCard.id="card-"+id;    
-    eNewCard.querySelector("#actions-div-1-0").id="actions-div-"+id+"-0";  
-    eNewCard.querySelector("#title-1").innerText="Flow "+id;
-    eNewCard.querySelector("#title-1").id="title-"+id;    
-    eNewCard.querySelector("#daily-1").id="daily-"+id;
-    eNewCard.querySelector("#shrink-1").id="shrink-"+id;
-    eNewCard.querySelector("#grow-1").id="grow-"+id;
-    eNewCard.querySelector("#apis-1").id="apis-"+id;
-    eNewCard.querySelector("#runs-1").id="runs-"+id;
-    eNewCard.querySelector("#action-1").id="action-"+id;
-    eNewCard.querySelectorAll("#days-1").name="days-"+id;
-    eNewCard.querySelector("#addLoop-button-1-0").id="addLoop-button-"+id+"-0";
-    eNewCard.querySelector("#addCond-button-1-0").id="addCond-button-"+id+"-0";
+    eNewCard.querySelector("#actions-div-0-0").id="actions-div-"+id+"-0";  
+    eNewCard.querySelector("#title-0").innerText="Flow "+id;
+    eNewCard.querySelector("#title-0").id="title-"+id;    
+    eNewCard.querySelector("#daily-0").id="daily-"+id;
+    eNewCard.querySelector("#shrink-0").id="shrink-"+id;
+    eNewCard.querySelector("#grow-0").id="grow-"+id;
+    eNewCard.querySelector("#apis-0").id="apis-"+id;
+    eNewCard.querySelector("#runs-0").id="runs-"+id;
+    eNewCard.querySelector("#action-0").id="action-"+id;
+    eNewCard.querySelector("#delete-button-card-0").id="delete-button-card-"+id;
+    eNewCard.querySelector("#addLoop-button-0-0").id="addLoop-button-"+id+"-0";
+    eNewCard.querySelector("#addCond-button-0-0").id="addCond-button-"+id+"-0";
     document.getElementById("action-"+id).addEventListener('change',function () {updateActions(0,id,true)});
     document.getElementById("shrink-"+id).addEventListener('click',function () {shrinkCard(id)});
     document.getElementById("grow-"+id).addEventListener('click',function () {growCard(id)});
@@ -121,9 +124,11 @@ function addCard(id){
     document.getElementById("addCond-button-"+id+"-0").addEventListener("click", function () {addCondition(0,id)});  
     document.getElementById("daily-"+id).addEventListener('click',function () {updateDaily(id)});
     document.getElementById("title-"+id).addEventListener('click',function () {updateCardTitle(id)});
+    document.getElementById("delete-button-card-"+id).addEventListener('click',function () {deleteCard(id)});
 
-    const aDaysOfWeek = document.querySelectorAll("input[name='days-"+id+"']");
+    const aDaysOfWeek = eNewCard.querySelectorAll("input[name='days-0']");
     aDaysOfWeek.forEach( item =>{
+        item.name="days-"+id;
         item.addEventListener('change',function () {updateCard(id)});
     })
 
@@ -141,7 +146,7 @@ function addCard(id){
         );
         aCards.push(
             {
-                cardId:iFlows,
+                flowId:id,
                 name:"Flow "+id,
                 dailyAPI:1,
                 runAPI:1,
@@ -150,16 +155,16 @@ function addCard(id){
                 solution:eSolutionTitle.innerText,
                 on:true,
                 guid:createGuid(),
-                containers:aContainers.filter(item => item.card==iFlows).slice(),
+                containers:aContainers.filter(item => item.flow==iFlows).slice(),
                 daysOfWeek:"su|mo|tu|we|th|fr|sa"
             }
         );
     }
-    updateTable(iFlows);
+    updateTable(id);
 }
 
 function addLoop(iLoop,iCard){
-    const iLoopCount=aContainers.filter(item => item.type === "loop" && item.card==iCard).length+1;   
+    const iLoopCount=aContainers.filter(item => item.type === "loop" && item.flow==iCard).length+1;   
     const id=aContainers.length;
     const container = document.createElement("div");
     container.style.marginLeft = "10px";
@@ -190,7 +195,8 @@ function addLoop(iLoop,iCard){
             parent:iLoop,
             actions:1,
             totalIterations:1,
-            card:iCard
+            flow:iCard,
+            branch:"n/a"
         }
     )  
     totalAPIs(iCard);
@@ -199,7 +205,7 @@ function addLoop(iLoop,iCard){
 }
 
 function addCondition(iCon,iCard){
-    const iConCount=aContainers.filter(item => item.type === "condition" && item.card==iCard).length+1;
+    const iConCount=aContainers.filter(item => item.type === "condition" && item.flow==iCard).length+1;
     let id=aContainers.length;
     let container = document.createElement("div");
     container.style.marginLeft = "10px";
@@ -249,7 +255,7 @@ function addCondition(iCon,iCard){
             parent:iCon,
             actions:1,
             totalIterations:0.5,
-            card:iCard,
+            flow:iCard,
             branch:"yes"
         },
         {
@@ -260,7 +266,7 @@ function addCondition(iCon,iCard){
             parent:iCon,
             actions:1,
             totalIterations:0.5,
-            card:iCard,
+            flow:iCard,
             branch:"no"
         }
     )  
@@ -284,14 +290,26 @@ function updateSolutionTable(sFilter){
         sTableSolutions+=sRow;
         if(sol.solutionId==sFilter || sFilter=="all"){
             sol.flows.forEach(flow =>{
-                let sRow="<tr><td>"+
-                flow.solution+"</td><td>"+
-                flow.name+"</td><td>"+
-                flow.runAPI+"</td><td>"+
-                flow.dailyAPI+"</td><td>"+
-                "<div class='form-check form-switch'><input class='form-check-input' type='checkbox' role='switch' id='flow-"+flow.guid+"' checked><label class='form-check-label' for='flow-"+flow.guid+"'></label></div></td></tr>";
-                if(!flow.on){sRow=sRow.replace(" checked>",">")}
-                sTableFlows+=sRow
+                const aDays=flow.daysOfWeek.split("|");
+                let bDayFound=false;
+                aDays.forEach(item =>{
+                    if(sDaysOfWeekFilter.includes(item)){
+                        bDayFound=true
+                        console.log(flow.name+" "+item+ " found")
+                    }else{
+                        console.log(flow.name+" "+item)
+                    }
+                })
+                if(bDayFound){
+                    let sRow="<tr><td>"+
+                    flow.solution+"</td><td>"+
+                    flow.name+"</td><td>"+
+                    flow.runAPI+"</td><td>"+
+                    flow.dailyAPI+"</td><td>"+
+                    "<div class='form-check form-switch'><input class='form-check-input' type='checkbox' role='switch' id='flow-"+flow.guid+"' checked><label class='form-check-label' for='flow-"+flow.guid+"'></label></div></td></tr>";
+                    if(!flow.on){sRow=sRow.replace(" checked>",">")}
+                    sTableFlows+=sRow
+                }
             })
         }
     })
@@ -334,12 +352,12 @@ function deleteSolution(id){
 }
 
 function updateCardTitle(id){
-    const updateItem=aCards.find(item => item.cardId === id);  
+    const updateItem=aCards.find(item => item.flowId === id);  
     const sTitle=document.getElementById("title-"+id).innerText;
     const sDaysOfWeek=getSelectedDays(id);
     Object.assign(updateItem,
         {
-            cardId:id,
+            flowdId:id,
             name:sTitle,
             dailyAPI:updateItem.dailyAPI,
             runAPI:updateItem.runAPI,
@@ -368,15 +386,15 @@ function updateCondition(id,iCard,branch){
     if(branch=="y"){
         iActions=Number(document.getElementById("action-"+iCard+"-"+id).value);
         iYes=iActions;   
-        iNo=aContainers.find(item => item.id === (id+1) && item.card==iCard).totalIterations; 
+        iNo=aContainers.find(item => item.id === (id+1) && item.flow==iCard).totalIterations; 
         iId=id; 
     }else if(branch=="n"){
         iActions=Number(document.getElementById("action-"+iCard+"-"+id).value);
-        iYes=aContainers.find(item => item.id === (id-1) && item.card==iCard).totalIterations;   
+        iYes=aContainers.find(item => item.id === (id-1) && item.flow==iCard).totalIterations;   
         iNo=iActions; 
         iId=(id-1);
     } 
-    const updateItem=aContainers.find(item => item.id === id && item.card==iCard);  
+    const updateItem=aContainers.find(item => item.id === id && item.flow==iCard);  
     Object.assign(updateItem,
         {
             type:"condition",
@@ -386,7 +404,8 @@ function updateCondition(id,iCard,branch){
             parent:updateItem.parent,
             actions:Number(document.getElementById("action-"+iCard+"-"+id).value),
             totalIterations:updateItem.iterations,
-            card:iCard
+            flow:iCard,
+            branch:updateItem.branch
         }
     )
       
@@ -394,7 +413,7 @@ function updateCondition(id,iCard,branch){
     console.log(aContainers)
     updateDaily(iCard);
 }
-
+//change
 function updateConditionPercent(id,iCard,branch){
     let eYesPercentage;
     let eNoPercentage;
@@ -425,7 +444,7 @@ function updateConditionPercent(id,iCard,branch){
             parent:updateItem.parent,
             actions:Number(document.getElementById("action-"+iCard+"-"+yId).value),
             totalIterations:eYesPercentage.value/100,
-            card:iCard,
+            flow:iCard,
             branch:"yes"
         }
     )
@@ -438,7 +457,7 @@ function updateConditionPercent(id,iCard,branch){
             parent:updateItem.parent,
             actions:Number(document.getElementById("action-"+iCard+"-"+nId).value),
             totalIterations:eNoPercentage.value/100,
-            card:iCard,
+            flow:iCard,
             branch:"no"
         }
     )
@@ -462,18 +481,19 @@ function updateActions(id,iCard,root){
             parent:updateItem.parent,
             actions:iActions,
             totalIterations:updateItem.iterations,
-            card:iCard
+            flow:iCard,
+            branch:updateItem.branch
         }
     )
     updateDaily(iCard);
 }
 
 function updateCard(id){
-    const updateItem=aCards.find(item => item.cardId === id);  
+    const updateItem=aCards.find(item => item.flowId === id);  
     const sDaysOfWeek=getSelectedDays(id);
     Object.assign(updateItem,
         {
-            cardId:updateItem.cardId,
+            flowId:updateItem.flowId,
             name:updateItem.name,
             dailyAPI:updateItem.dailyAPI,
             runAPI:updateItem.runAPI,
@@ -482,7 +502,7 @@ function updateCard(id){
             solution:updateItem.solution,
             on:updateItem.on,
             guid:updateItem.guid,
-            containers:aContainers.filter(item => item.card==id),
+            containers:aContainers.filter(item => item.flow==id),
             daysOfWeek:sDaysOfWeek 
         }
     )
@@ -490,7 +510,7 @@ function updateCard(id){
 }
 
 function updateIterations(id,iCard){
-    const updateItem=aContainers.find(item => item.id === id && item.card==iCard);    
+    const updateItem=aContainers.find(item => item.id === id && item.flow==iCard);    
     Object.assign(updateItem,
         {
             type:updateItem.type,
@@ -500,7 +520,8 @@ function updateIterations(id,iCard){
             parent:updateItem.parent,
             actions:updateItem.actions,
             totalIterations:Number(document.getElementById("loop-"+iCard+"-"+id).value),
-            card:iCard
+            flow:iCard,
+            branch:updateItem.branch
         }
     )
     updateDaily(iCard);
@@ -514,15 +535,15 @@ function updateDaily(iCard){
 
 function updateTable(id){
     const sDaysOfWeek=getSelectedDays(id);
-    const updateItem=aCards.find(item => item.cardId === id);  
-    const updatedData = aContainers.filter(item =>{return item.card==id})
+    const updateItem=aCards.find(item => item.flowId === id);  
+    const updatedData = aContainers.filter(item =>{return item.flow==id})
     let iTotalActions=0;
     updatedData.forEach(item =>{
         iTotalActions+=item.actions
     })    
     Object.assign(updateItem,
         {
-            cardId:id,
+            flowId:id,
             name:updateItem.name,
             dailyAPI:Number(document.getElementById("apis-"+id).innerText),
             runAPI:Number(document.getElementById("runs-"+id).innerText),
@@ -562,30 +583,30 @@ function loadSolution(id){
     eleftSection.innerHTML="";   
     eSolutionTitle.innerText=oSolution.solutionName;
     aCards.forEach(card => {
-        addCard(card.cardId);
+        addCard(card.flowId);
         card.containers.forEach(item =>{
             console.log(item)
             let eActions;
             switch(item.type){
                 case "loop":
-                    addLoop(item.parent,card.cardId)
-                    const eLoop = document.getElementById("loop-"+card.cardId+"-"+item.parent);
-                    eActions=document.getElementById("action-"+card.cardId+"-"+item.parent);
+                    addLoop(item.parent,card.flowId)
+                    const eLoop = document.getElementById("loop-"+card.flowId+"-"+item.parent);
+                    eActions=document.getElementById("action-"+card.flowId+"-"+item.parent);
                     eLoop.value=item.iterations;                    
                     eActions.value=item.actions;
                     break;
                 case "condition":
                     if(item.branch=="yes"){
-                        addCondition(item.parent,card.cardId)
-                        console.log("con-"+card.cardId+"-"+item.id)
-                        const eCon = document.getElementById("con-"+card.cardId+"-"+item.id);
-                        eActions=document.getElementById("action-"+card.cardId+"-"+item.id);
+                        addCondition(item.parent,card.flowId)
+                        console.log("con-"+card.flowId+"-"+item.id)
+                        const eCon = document.getElementById("con-"+card.flowId+"-"+item.id);
+                        eActions=document.getElementById("action-"+card.flowId+"-"+item.id);
                         eCon.value=item.iterations;
                         eActions.value=item.actions;
                     }                   
                     break
                 case "action":
-                    eActions=document.getElementById("action-"+card.cardId);
+                    eActions=document.getElementById("action-"+card.flowId);
                     eActions.value=item.actions;
                     break
             }
@@ -597,12 +618,12 @@ function loadSolution(id){
 }
 
 function totalAPIs(iCard){
-    const updatedData = aContainers.filter(item =>{return item.card==iCard})
+    const updatedData = aContainers.filter(item =>{return item.flow==iCard})
     let iTotalAPIS=0;
     updatedData.forEach(item =>{
         iTotalAPIS+=(item.totalIterations*item.actions)
     })    
-    const aConditions = aContainers.filter(item =>{return item.card==iCard && item.type=="condition"});
+    const aConditions = aContainers.filter(item =>{return item.flow==iCard && item.type=="condition"});
     iTotalAPIS+=aConditions.length/2;
 
     document.getElementById("runs-"+iCard).innerText=iTotalAPIS; 
@@ -633,6 +654,12 @@ function updateTotalIterations(data) {
   return data;
 }
 
+function deleteCard(iCard){
+    document.getElementById("card-"+iCard).remove();
+    aContainers = aContainers.filter(item => item.flow != iCard);
+    aCards=aCards.filter(item => item.flowId !=iCard);
+}
+
 function deleteCondition(id,iCard){
     deleteContainer(id,iCard);
     deleteContainer((id+1),iCard);
@@ -645,7 +672,7 @@ function deleteContainer(id,iCard){
 
 function getChildAndDelete(id,iCard){
     aContainers = aContainers.filter(item => item.id !== id);
-    const aDelete=aContainers.filter(item => item.parent === id && item.card==iCard); 
+    const aDelete=aContainers.filter(item => item.parent === id && item.flow==iCard); 
     aDelete.forEach(item =>{    
         getChildAndDelete(item.id,iCard)
     })
@@ -686,8 +713,8 @@ function growCard(id) {
 }
 
 function closeOtherCards(id){
-    const aOtherCards=aCards.filter(item => {return item.cardId!=id});
-    aOtherCards.forEach(item => {shrinkCard(item.cardId)});
+    const aOtherCards=aCards.filter(item => {return item.flow!=id});
+    aOtherCards.forEach(item => {shrinkCard(item.flowId)});
 }
 
 function onTransitionEnd(event) {
@@ -732,10 +759,11 @@ function newSolution(){
         parent:0,
         actions:1,
         totalIterations:1,
-        card:1
+        flow:1,
+        branch:"n/a"
     }];
     aCards=[{
-        cardId:1,
+        flowId:1,
         name:"Flow 1",
         dailyAPI:1,
         runAPI:1,
@@ -749,7 +777,7 @@ function newSolution(){
     }];
     iFlows=1;
     eleftSection.innerHTML="";
-    addCard(1)
+    addCard(0)
 
 }
 
@@ -783,4 +811,25 @@ function getNow(){
 
     console.log(sNow)
     return sNow
+}
+
+function openPopup(button) {
+    const popup = document.getElementById("daysPopup");
+    popup.style.display = "block";
+    const buttonRect = button.getBoundingClientRect();
+    popup.style.top = buttonRect.bottom + "px";
+    popup.style.left = buttonRect.left + "px";
+    const windowWidth = window.innerWidth;
+    const popupWidth = popup.offsetWidth;
+    if (buttonRect.left + popupWidth > windowWidth) {
+        popup.style.left = windowWidth - popupWidth + "px";
+    }
+}
+
+function closePopup() {
+    const checkboxes = document.querySelectorAll("input[name='days-filter']:checked");
+    const selectedDays = Array.from(checkboxes).map(checkbox => checkbox.value);
+    sDaysOfWeekFilter=selectedDays.join('|') || '';
+    console.log(sDaysOfWeekFilter)
+    document.getElementById("daysPopup").style.display = "none";
 }

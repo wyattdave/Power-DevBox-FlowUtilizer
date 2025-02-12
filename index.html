@@ -5,50 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Untree.co">
     <link rel="shortcut icon" href="favicon.png">
-    <style>
-        h1 {
-            font-weight: bold;
-            font-size: 26px !important;
-        }
-
-        h2 {
-            font-weight: bold;
-            font-size: 20px !important;
-        }
-
-        h3 {
-
-            font-size: 14px !important;
-        }
-
-        input {
-            width:50px;
-        }
-
-        button{
-        
-            margin-right: 10px !important;
-        }
-
-        .sm{
-            padding: .25rem .5rem !important;
-            font-size: .875rem !important;
-        }
-        @media only screen and (min-width: 992px){
-        .panelAutoHeight{          
-                height:calc(100vh - (69px + 84px + 30px)); 
-            }
-        }
-        .sideways{
-            display:flex;
-            flex-direction: row;
- 
-        }
-        input[type="checkbox"]{
-            width:20px;
-        }
-
-    </style>
     <meta name="description" content="" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
     <!-- Bootstrap CSS -->
@@ -83,36 +39,39 @@
             <div class="row">
                 <div id="left-section" class="col-lg-6 col-md-12 col-sm-12 panelAutoHeight" style="overflow:auto">
                     <div id="card-0">
-                        <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
+                        <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-0-0">
                             <div class="card-body">
-                                <h5 class="card-title" contenteditable="true" id="title-1">Flow 1</h5>
-                                <i class="fa-solid fa-down-left-and-up-right-to-center top-corner" id="shrink-1"></i>
-                                <i class="fa-solid fa-up-right-and-down-left-from-center top-corner" id="grow-1" style="display: none;"></i>
+                                <h5 class="card-title" contenteditable="true" id="title-0">Flow 1</h5>
+                                <i class="fa-solid fa-down-left-and-up-right-to-center top-corner" id="shrink-0"></i>
+                                <i class="fa-solid fa-up-right-and-down-left-from-center top-corner" id="grow-0" style="display: none;"></i>
                                 <div class="row">
-                                    <div class="col-6">                                
-                                        <p>Daily Runs: <input id="daily-1" type="number" value="1"></input></p>
+                                    <div class="col-5">                                
+                                        <p>Daily Runs: <input id="daily-0" type="number" value="1"></input></p>
                                     </div>
                                     <div class="col-3">  
-                                        <p>Run APIs: <span id="runs-1">1</span></p>
+                                        <p>Run APIs: <span id="runs-0">1</span></p>
                                     </div>
                                     <div class="col-3">  
-                                        <p> Daily APIs : <span id="apis-1">1</span></p>
+                                        <p> Daily APIs : <span id="apis-0">1</span></p>
+                                    </div>
+                                    <div class="col-1">  
+                                        <Button class="btn btn-dark sm" id="delete-button-card-0"><i class="fa-solid fa-trash-can"></i></Button>
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="sideways">
-                                    <label><input type="checkbox" name="days-1" value="su" checked> Sun</label><br>  
-                                    <label><input type="checkbox" name="days-1" value="mu" checked> Mon</label><br>
-                                    <label><input type="checkbox" name="days-1" value="tu" checked> Tue</label><br>
-                                    <label><input type="checkbox" name="days-1" value="we" checked> Wed</label><br>
-                                    <label><input type="checkbox" name="days-1" value="th" checked> Thu</label><br>
-                                    <label><input type="checkbox" name="days-1" value="fr" checked> Fri</label><br>
-                                    <label><input type="checkbox" name="days-1" value="sa" checked> Sat</label><br>                                          
+                                    <label><input type="checkbox" name="days-0" value="su" checked> Sun</label><br>  
+                                    <label><input type="checkbox" name="days-0" value="mu" checked> Mon</label><br>
+                                    <label><input type="checkbox" name="days-0" value="tu" checked> Tue</label><br>
+                                    <label><input type="checkbox" name="days-0" value="we" checked> Wed</label><br>
+                                    <label><input type="checkbox" name="days-0" value="th" checked> Thu</label><br>
+                                    <label><input type="checkbox" name="days-0" value="fr" checked> Fri</label><br>
+                                    <label><input type="checkbox" name="days-0" value="sa" checked> Sat</label><br>                                          
                                 </div>  
                                 <h6 class="card-subtitle mb-2 text-muted">Run Details</h6>                                
-                                Top level actions: <input id="action-1" type="number" value="1"></input>
-                                <button type="button" class="btn btn-dark sm" id="addLoop-button-1-0"><i class="fa-solid fa-retweet"></i> Add Loop</button>
-                                <button type="button" class="btn btn-dark sm" id="addCond-button-1-0"><i class="fa-solid fa-arrow-right-arrow-left"></i> Add Condition</button>
+                                Top level actions: <input id="action-0" type="number" value="1"></input>
+                                <button type="button" class="btn btn-dark sm" id="addLoop-button-0-0"><i class="fa-solid fa-retweet"></i> Add Loop</button>
+                                <button type="button" class="btn btn-dark sm" id="addCond-button-0-0"><i class="fa-solid fa-arrow-right-arrow-left"></i> Add Condition</button>
                             </div>
                         </div>
                     </div>
@@ -170,11 +129,62 @@
                                 <Button type="button" class="btn btn-dark sm" id="clear-filter" style="margin-left:20px">
                                     <i class="fa-solid fa-filter-circle-xmark"></i>
                                 </Button>
+                                <Button type="button" class="btn btn-dark sm" id="days-filter" style="margin-left:20px" onclick="openPopup(this)">
+                                    <i class="fas fa-calendar-day"></i>
+                                </Button>
                             </h4>
                             <div id="right-table" ></div>
                         </div>  
                     </div>
-                </div>    
+                </div>
+                <div class="popup" id="daysPopup">
+                    <h2>Select Days</h2>
+                    <ul>
+                    <li>
+                        <label>
+                            <input type="checkbox" name="days-filter" value="su" checked/>
+                            Sunday
+                        </label>
+                        </li>
+                     <li>
+                      <label>
+                       <input type="checkbox" name="days-filter" value="mo" checked/>
+                       Monday
+                      </label>
+                     </li>
+                     <li>
+                      <label>
+                       <input type="checkbox" name="days-filter" value="tu" checked/>
+                       Tuesday
+                      </label>
+                     </li>
+                     <li>
+                      <label>
+                       <input type="checkbox" name="days-filter" value="we" checked/>
+                       Wednesday
+                      </label>
+                     </li>
+                     <li>
+                      <label>
+                       <input type="checkbox" name="days-filter" value="th" checked/>
+                       Thursday
+                      </label>
+                     </li>
+                     <li>
+                      <label>
+                       <input type="checkbox" name="days-filter" value="fr" checked/>
+                       Friday
+                      </label>
+                     </li>
+                     <li>
+                      <label>
+                       <input type="checkbox" name="days-filter" value="sa" checked/>
+                       Saturday
+                      </label>
+                     </li>                     
+                    </ul>
+                    <button class="btn btn-dark sm" id="close-filter-days">Filter</button>
+                   </div>    
             </div>
         </div>
     </div>

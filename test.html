@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Days of the Week Popup</title>
+  <style>
+   /* Basic styling for the popup */
+   .popup {
+    position: absolute; /* Changed to absolute */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none; /* Hidden by default */
+   }
+
+   .popup h2 {
+    margin-top: 0;
+   }
+
+   .popup ul {
+    list-style: none;
+    padding: 0;
+   }
+
+   .popup li {
+    margin-bottom: 5px;
+   }
+
+   /* Button to trigger the popup */
+   .open-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    position: relative; /* Needed for popup positioning */
+   }
+
+   /* Container to hold button and popup */
+   .popup-container {
+    position: relative; /* Establishes positioning context */
+    display: inline-block; /* Adjust as needed (block, inline-block) */
+   }
+  </style>
+ </head>
+ <body>
+  <div class="popup-container">
+   <button class="open-button" onclick="openPopup(this)">
+    Select Days of the Week
+   </button>
+
+   <div class="popup" id="daysPopup">
+    <h2>Select Days</h2>
+    <ul>
+     <li>
+      <label>
+       <input type="checkbox" name="days" value="Monday" />
+       Monday
+      </label>
+     </li>
+     <li>
+      <label>
+       <input type="checkbox" name="days" value="Tuesday" />
+       Tuesday
+      </label>
+     </li>
+     <li>
+      <label>
+       <input type="checkbox" name="days" value="Wednesday" />
+       Wednesday
+      </label>
+     </li>
+     <li>
+      <label>
+       <input type="checkbox" name="days" value="Thursday" />
+       Thursday
+      </label>
+     </li>
+     <li>
+      <label>
+       <input type="checkbox" name="days" value="Friday" />
+       Friday
+      </label>
+     </li>
+     <li>
+      <label>
+       <input type="checkbox" name="days" value="Saturday" />
+       Saturday
+      </label>
+     </li>
+     <li>
+      <label>
+       <input type="checkbox" name="days" value="Sunday" />
+       Sunday
+      </label>
+     </li>
+    </ul>
+    <button onclick="closePopup()">Close</button>
+   </div>
+  </div>
+
+  <script>
+   function openPopup(button) {
+    const popup = document.getElementById("daysPopup");
+    popup.style.display = "block";
+
+    // Position the popup next to the button
+    const buttonRect = button.getBoundingClientRect();
+    popup.style.top = buttonRect.bottom + "px"; // Below the button
+    popup.style.left = buttonRect.left + "px"; // Align left edge
+
+    // Optional:  Prevent popup from going off-screen
+    const windowWidth = window.innerWidth;
+    const popupWidth = popup.offsetWidth;
+    if (buttonRect.left + popupWidth > windowWidth) {
+     popup.style.left = windowWidth - popupWidth + "px"; // Align right edge
+    }
+   }
+
+   function closePopup() {
+    document.getElementById("daysPopup").style.display = "none";
+   }
+  </script>
+ </body>
+</html>

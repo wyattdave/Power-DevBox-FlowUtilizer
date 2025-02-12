@@ -774,3 +774,85 @@ textarea {
     height: 50px;
     border-radius: 50%;
     background: rgba(59, 93, 80, 0.2); }
+
+
+    h1 {
+      font-weight: bold;
+      font-size: 26px !important;
+  }
+
+  h2 {
+      font-weight: bold;
+      font-size: 20px !important;
+  }
+
+  h3 {
+
+      font-size: 14px !important;
+  }
+
+  input {
+      width:50px;
+  }
+
+  button{
+  
+      margin-right: 10px !important;
+  }
+
+  .sm{
+      padding: .25rem .5rem !important;
+      font-size: .875rem !important;
+  }
+  @media only screen and (min-width: 992px){
+  .panelAutoHeight{          
+          height:calc(100vh - (69px + 84px + 30px)); 
+      }
+  }
+  .sideways{
+      display:flex;
+      flex-direction: row;
+
+  }
+  input[type="checkbox"]{
+      width:20px;
+  }
+  .popup {
+      position: absolute; 
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: none; 
+      width:200px;
+  }
+
+  .popup h2 {
+      margin-top: 0;
+  }
+
+  .popup ul {
+      list-style: none;
+      padding: 0;
+  }
+
+  .popup li {
+      margin-bottom: 5px;
+  }
+
+ 
+  .open-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+  }
+
+  
+  .popup-container {
+      position: relative; 
+      display: inline-block; 
+  }
