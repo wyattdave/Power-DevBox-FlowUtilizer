@@ -1,5 +1,4 @@
 let iElementAutoHeight=0
-let iFlows=1;
 let iCurrentCard=0;
 let aSolutions=[];
 let sSolution=createGuid();
@@ -46,14 +45,15 @@ let aCards=[{
     daysOfWeek:"su|mo|tu|we|th|fr|sa"
 }];
 
-eAddCard.addEventListener("click", function () {addCard(-1)});
+eAddCard.addEventListener("click", function () {addCard({})});
 eSwitch.addEventListener("click", switchMode);
-eAddLoop.addEventListener("click", function () {addLoop(0,0)});
+eAddLoop.addEventListener("click", function () {addLoop(0,0,{})});
 eAddCondition.addEventListener("click", function () {addCondition(0,0)});
 eSolutionTitle.addEventListener('input', (event) => {updateTable(iCurrentCard)});
 eSaveSolution.addEventListener('click',function () {saveSolution()});
 eNewSolution.addEventListener('click',function () {newSolution()});
 document.getElementById("downloadYAML").addEventListener("click", downloadYaml);
+document.getElementById("title-0").addEventListener('click',function () {updateCardTitle(0)});
 document.getElementById("action-0").addEventListener('change',function () {updateActions(0,0,true)});
 document.getElementById("delete-button-card-0").addEventListener('click',function () {deleteCard(0)});
 document.getElementById("shrink-0").addEventListener('click',function () {shrinkCard(0)});
@@ -62,6 +62,7 @@ document.getElementById("daily-0").addEventListener('change',function () {update
 document.getElementById("title-0").addEventListener('input', (event) => {updateCardTitle(0)});
 document.getElementById("clear-filter").addEventListener('click',function () {updateSolutionTable("all")});
 document.getElementById("close-filter-days").addEventListener('click',closePopup)
+
 const aDaysOfWeekChecks = document.querySelectorAll("input[name='days-1']");
 aDaysOfWeekChecks.forEach( item =>{
     item.addEventListener('change',function () {updateCard(1)});
@@ -89,108 +90,81 @@ function switchMode(){
     }
 }
 
-function addCard(id){
-    let bNew=true;
-    if(id==-1){
-        iFlows++;
-        id=createGuid();
-        closeOtherCards(id);
-    }else{
-        iFlows=id;
-        bNew=false;
-    }
-    
-    document.getElementById("flow-count").innerText=id;
+function addCard(oFlow){
+    if(JSON.stringify(oFlow)=="{}"){
+        oFlow={
+            name:"Flow "+(aCards.length+1),
+            flowId:createGuid(),
+            dailyAPI:1,
+            runAPI:1,
+            actions:1,
+            daily:1,
+            solution:"Solution Name",
+            on:true,
+            guid:createGuid(),
+            containers:aContainers.slice(),
+            daysOfWeek:"su|mo|tu|we|th|fr|sa"
+        };
+    }   
+    document.getElementById("flow-count").innerText=aCards.length;
     const eNewCard=eTemplate.cloneNode(true);
 
     eleftSection.appendChild(eNewCard);
-    eNewCard.id="card-"+id;    
-    eNewCard.querySelector("#actions-div-0-0").id="actions-div-"+id+"-0";  
-    eNewCard.querySelector("#title-0").innerText="Flow "+id;
-    eNewCard.querySelector("#title-0").id="title-"+id;    
-    eNewCard.querySelector("#daily-0").id="daily-"+id;
-    eNewCard.querySelector("#shrink-0").id="shrink-"+id;
-    eNewCard.querySelector("#grow-0").id="grow-"+id;
-    eNewCard.querySelector("#apis-0").id="apis-"+id;
-    eNewCard.querySelector("#runs-0").id="runs-"+id;
-    eNewCard.querySelector("#action-0").id="action-"+id;
-    eNewCard.querySelector("#delete-button-card-0").id="delete-button-card-"+id;
-    eNewCard.querySelector("#addLoop-button-0-0").id="addLoop-button-"+id+"-0";
-    eNewCard.querySelector("#addCond-button-0-0").id="addCond-button-"+id+"-0";
-    document.getElementById("action-"+id).addEventListener('change',function () {updateActions(0,id,true)});
-    document.getElementById("shrink-"+id).addEventListener('click',function () {shrinkCard(id)});
-    document.getElementById("grow-"+id).addEventListener('click',function () {growCard(id)});
-    document.getElementById("addLoop-button-"+id+"-0").addEventListener("click", function () {addLoop(0,id)});  
-    document.getElementById("addCond-button-"+id+"-0").addEventListener("click", function () {addCondition(0,id)});  
-    document.getElementById("daily-"+id).addEventListener('click',function () {updateDaily(id)});
-    document.getElementById("title-"+id).addEventListener('click',function () {updateCardTitle(id)});
-    document.getElementById("delete-button-card-"+id).addEventListener('click',function () {deleteCard(id)});
+    eNewCard.id="card-"+oFlow.flowId;    
+    eNewCard.querySelector("#actions-div-0-0").id="actions-div-"+oFlow.flowId+"-0";  
+    eNewCard.querySelector("#title-0").innerText=oFlow.name;
+    eNewCard.querySelector("#title-0").id="title-"+oFlow.flowId;    
+    eNewCard.querySelector("#daily-0").id="daily-"+oFlow.flowId;
+    eNewCard.querySelector("#shrink-0").id="shrink-"+oFlow.flowId;
+    eNewCard.querySelector("#grow-0").id="grow-"+oFlow.flowId;
+    eNewCard.querySelector("#apis-0").id="apis-"+oFlow.flowId;
+    eNewCard.querySelector("#runs-0").id="runs-"+oFlow.flowId;
+    eNewCard.querySelector("#action-0").id="action-"+oFlow.flowId;
+    eNewCard.querySelector("#delete-button-card-0").id="delete-button-card-"+oFlow.flowId;
+    eNewCard.querySelector("#addLoop-button-0-0").id="addLoop-button-"+oFlow.flowId+"-0";
+    eNewCard.querySelector("#addCond-button-0-0").id="addCond-button-"+oFlow.flowId+"-0";
+    document.getElementById("action-"+oFlow.flowId).addEventListener('change',function () {updateActions(0,oFlow.flowId,true)});
+    document.getElementById("shrink-"+oFlow.flowId).addEventListener('click',function () {shrinkCard(oFlow.flowId)});
+    document.getElementById("grow-"+oFlow.flowId).addEventListener('click',function () {growCard(oFlow.flowId)});
+    document.getElementById("addLoop-button-"+oFlow.flowId+"-0").addEventListener("click", function () {addLoop(0,oFlow.flowId,{})});  
+    document.getElementById("addCond-button-"+oFlow.flowId+"-0").addEventListener("click", function () {addCondition(0,oFlow.flowId)});  
+    document.getElementById("daily-"+oFlow.flowId).addEventListener('click',function () {updateDaily(oFlow.flowId)});
+    document.getElementById("title-"+oFlow.flowId).addEventListener('click',function () {updateCardTitle(oFlow.flowId)});
+    document.getElementById("delete-button-card-"+oFlow.flowId).addEventListener('click',function () {deleteCard(oFlow.flowId)});
+
+    document.getElementById("title-"+oFlow.flowId).innerText=oFlow.name;
+    document.getElementById("runs-"+oFlow.flowId).innerText=oFlow.runAPI;
+    document.getElementById("apis-"+oFlow.flowId).innerText=oFlow.dailyAPI;
+    document.getElementById("daily-"+oFlow.flowId).value=oFlow.daily;
 
     const aDaysOfWeek = eNewCard.querySelectorAll("input[name='days-0']");
     aDaysOfWeek.forEach( item =>{
-        item.name="days-"+id;
-        item.addEventListener('change',function () {updateCard(id)});
+        item.name="days-"+oFlow.d;
+        item.addEventListener('change',function () {updateCard(oFlow.flowId)});
     })
-
-    if(bNew){
-        aContainers.push(
-            {
-                type:"action",
-                id: aContainers.length+1,
-                iterations:1,
-                parent:0,
-                actions:1,
-                totalIterations:1,
-                card:id
-            }
-        );
-        aCards.push(
-            {
-                flowId:id,
-                name:"Flow "+id,
-                dailyAPI:1,
-                runAPI:1,
-                actions:1,
-                daily:1,
-                solution:eSolutionTitle.innerText,
-                on:true,
-                guid:createGuid(),
-                containers:aContainers.filter(item => item.flow==iFlows).slice(),
-                daysOfWeek:"su|mo|tu|we|th|fr|sa"
-            }
-        );
-    }
-    updateTable(id);
-}
-
-function addLoop(iLoop,iCard){
-    const iLoopCount=aContainers.filter(item => item.type === "loop" && item.flow==iCard).length+1;   
-    const id=aContainers.length;
-    const container = document.createElement("div");
-    container.style.marginLeft = "10px";
-    container.style.marginRight = "2px";
-    container.id="actions-div-"+iCard+"-"+id;
-    container.className="card border-black mb-3";
-    container.innerHTML ="<p style='margin-left:"+(iLoop*10)+
-    "px;' contenteditable='true'>Loop "+iLoopCount+"</p><p style='margin-left:"+(iLoop+1)*10+
-    "px;'>Iterations:<input id='loop-"+iCard+"-"+id+"' type='number' value='1'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+id+
-    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+id+
-    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+id+
-    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iLoop+1)*10+
-    "px;'>Child actions:<input id='action-"+iCard+"-"+id+"' type='number' value='1'/></p>"
-
-    document.getElementById("actions-div-"+iCard+"-"+iLoop).appendChild(container);
-    console.log("addLoop-button-"+iCard+"-"+iLoopCount)
-    document.getElementById("addLoop-button-"+iCard+"-"+id).addEventListener('click',function () {addLoop(id,iCard)});
-    document.getElementById("addCon-button-"+iCard+"-"+id).addEventListener('click',function () {addCondition(id,iCard)});
-    document.getElementById("delete-button-"+iCard+"-"+id).addEventListener('click',function () {deleteContainer(id,iCard)});
-    document.getElementById("loop-"+iCard+"-"+id).addEventListener('change',function () {updateIterations(id,iCard)});
-    document.getElementById("action-"+iCard+"-"+id).addEventListener('change',function () {updateActions(id,iCard,false)});
+    
     aContainers.push(
         {
+            type:"action",
+            id: createGuid(),
+            iterations:1,
+            parent:0,
+            actions:1,
+            totalIterations:1,
+            card:oFlow.flowId
+        }
+    );
+    aCards.push(oFlow);
+    updateTable(oFlow.flowId);
+}
+
+function addLoop(iLoop,iCard,oLoop){
+    const iLoopCount=aContainers.filter(item => item.type === "loop" && item.flow==iCard).length+1;   
+    if(JSON.stringify(oLoop)=="{}"){
+        oLoop= {
             type:"loop",
             typeId: iLoopCount,
-            id:id,
+            id:createGuid(),
             iterations:1,
             parent:iLoop,
             actions:1,
@@ -198,15 +172,36 @@ function addLoop(iLoop,iCard){
             flow:iCard,
             branch:"n/a"
         }
-    )  
+    }
+    const container = document.createElement("div");
+    container.style.marginLeft = "10px";
+    container.style.marginRight = "2px";
+    container.id="actions-div-"+iCard+"-"+oLoop.id;
+    container.className="card border-black mb-3";
+    container.innerHTML ="<p style='margin-left:"+(iLoop*10)+
+    "px;' contenteditable='true'>Loop "+iLoopCount+"</p><p style='margin-left:"+(iLoop+1)*10+
+    "px;'>Iterations:<input id='loop-"+iCard+"-"+oLoop.id+"' type='number' value='1'/><Button class='btn btn-dark sm' id='addLoop-button-"+iCard+"-"+oLoop.id+
+    "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+iCard+"-"+oLoop.id+
+    "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+iCard+"-"+oLoop.id+
+    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iLoop+1)*10+
+    "px;'>Child actions:<input id='action-"+iCard+"-"+oLoop.id+"' type='number' value='1'/></p>"
+
+    document.getElementById("actions-div-"+iCard+"-"+iLoop).appendChild(container);
+    console.log("addLoop-button-"+iCard+"-"+iLoop)
+    document.getElementById("addLoop-button-"+iCard+"-"+oLoop.id).addEventListener('click',function () {addLoop(oLoop.id,iCard,{})});
+    document.getElementById("addCon-button-"+iCard+"-"+oLoop.id).addEventListener('click',function () {addCondition(oLoop.id,iCard)});
+    document.getElementById("delete-button-"+iCard+"-"+oLoop.id).addEventListener('click',function () {deleteContainer(oLoop.id,iCard)});
+    document.getElementById("loop-"+iCard+"-"+oLoop.id).addEventListener('change',function () {updateIterations(oLoop.id,iCard)});
+    document.getElementById("action-"+iCard+"-"+oLoop.id).addEventListener('change',function () {updateActions(oLoop.id,iCard,false)});
+    aContainers.push(oLoop);
     totalAPIs(iCard);
     updateDaily(iCard);
     updateCard(iCard);
 }
 
-function addCondition(iCon,iCard){
+function addCondition(iCon,iCard,id){
     const iConCount=aContainers.filter(item => item.type === "condition" && item.flow==iCard).length+1;
-    let id=aContainers.length;
+    id=id || createGuid();
     let container = document.createElement("div");
     container.style.marginLeft = "10px";
     container.style.marginRight = "2px";
@@ -221,14 +216,14 @@ function addCondition(iCon,iCard){
     "px;'>Yes child actions:&nbsp;<input id='action-"+iCard+"-"+id+"' type='number' value='1'/></p>"
 
     document.getElementById("actions-div-"+iCard+"-"+iCon).appendChild(container);
-    document.getElementById("addLoop-button-"+iCard+"-"+id).addEventListener('click',function () {addLoop(id,iCard)});
+    document.getElementById("addLoop-button-"+iCard+"-"+id).addEventListener('click',function () {addLoop(id,iCard,{})});
     document.getElementById("addCon-button-"+iCard+"-"+id).addEventListener('click',function () {addCondition(id,iCard)});
     document.getElementById("delete-button-"+iCard+"-"+id).addEventListener('click',function () {deleteCondition(id,iCard)});
     document.getElementById("con-"+iCard+"-"+id).addEventListener('change',function () {updateConditionPercent(id,iCard,"y")});
     document.getElementById("action-"+iCard+"-"+id).addEventListener('change',function () {updateCondition(id,iCard,"y")});
     document.getElementById("conTitle-"+iCard+"-"+id).addEventListener('input', (event) => {updateConTitle(id,iCard)});
 
-    const idN=aContainers.length+1;
+    const idN=id+"-n";
     container = document.createElement("div");
     container.style.marginLeft = "10px";
     container.style.marginRight = "2px";
@@ -242,7 +237,7 @@ function addCondition(iCon,iCard){
     "px;'>No child actions&nbsp;<input id='action-"+iCard+"-"+idN+"' type='number' value='1' style='width:90px'/></p>"
 
     document.getElementById("actions-div-"+iCard+"-"+iCon).appendChild(container);
-    document.getElementById("addLoop-button-"+iCard+"-"+idN).addEventListener('click',function () {addLoop(idN,iCard)});
+    document.getElementById("addLoop-button-"+iCard+"-"+idN).addEventListener('click',function () {addLoop(idN,iCard,{})});
     document.getElementById("addCon-button-"+iCard+"-"+idN).addEventListener('click',function () {addCondition(idN,iCard)});
     document.getElementById("con-"+iCard+"-"+idN).addEventListener('change',function () {updateConditionPercent(idN,iCard,"n")});
     document.getElementById("action-"+iCard+"-"+idN).addEventListener('change',function () {updateCondition(idN,iCard,"n")});
@@ -295,9 +290,6 @@ function updateSolutionTable(sFilter){
                 aDays.forEach(item =>{
                     if(sDaysOfWeekFilter.includes(item)){
                         bDayFound=true
-                        console.log(flow.name+" "+item+ " found")
-                    }else{
-                        console.log(flow.name+" "+item)
                     }
                 })
                 if(bDayFound){
@@ -357,7 +349,7 @@ function updateCardTitle(id){
     const sDaysOfWeek=getSelectedDays(id);
     Object.assign(updateItem,
         {
-            flowdId:id,
+            flowId:id,
             name:sTitle,
             dailyAPI:updateItem.dailyAPI,
             runAPI:updateItem.runAPI,
@@ -383,16 +375,20 @@ function updateCondition(id,iCard,branch){
     let iYes=0;
     let iNo=0;
     let iId=0;
+    let yId="";
+    let nId="";
     if(branch=="y"){
         iActions=Number(document.getElementById("action-"+iCard+"-"+id).value);
         iYes=iActions;   
-        iNo=aContainers.find(item => item.id === (id+1) && item.flow==iCard).totalIterations; 
-        iId=id; 
+        iNo=aContainers.find(item => item.id === (id+"-n") && item.flow==iCard).totalIterations; 
+        nId=id+"-n";
+        yId=id;
     }else if(branch=="n"){
         iActions=Number(document.getElementById("action-"+iCard+"-"+id).value);
-        iYes=aContainers.find(item => item.id === (id-1) && item.flow==iCard).totalIterations;   
+        iYes=aContainers.find(item => item.id === (id.replace("-n","")) && item.flow==iCard).totalIterations;   
         iNo=iActions; 
-        iId=(id-1);
+        nId=id;
+        yId=id.replace("-n","");
     } 
     const updateItem=aContainers.find(item => item.id === id && item.flow==iCard);  
     Object.assign(updateItem,
@@ -409,27 +405,27 @@ function updateCondition(id,iCard,branch){
         }
     )
       
-    document.getElementById("conCalc-"+iCard+"-"+iId).innerText="Actions = Yes: "+iYes+", No:"+iNo+", Condition:"+(iYes+iNo)/2;
+    document.getElementById("conCalc-"+iCard+"-"+yId).innerText="Actions = Yes: "+iYes+", No:"+nId+", Condition:"+(iYes+iNo)/2;
     console.log(aContainers)
     updateDaily(iCard);
 }
-//change
+
 function updateConditionPercent(id,iCard,branch){
     let eYesPercentage;
     let eNoPercentage;
-    let yId=0;
-    let nId=0;
+    let yId="";
+    let nId="";
     if(branch=="y"){
-        eYesPercentage=document.getElementById("con-"+iCard+"-"+id);
-        eNoPercentage=document.getElementById("con-"+iCard+"-"+(id+1));
         yId=id;
-        nId=id+1;
+        nId=id+"-n";
+        eYesPercentage=document.getElementById("con-"+iCard+"-"+yId);
+        eNoPercentage=document.getElementById("con-"+iCard+"-"+nId);     
         eNoPercentage.value=(100-eYesPercentage.value);
     }else if(branch=="n"){
-        eYesPercentage=document.getElementById("con-"+iCard+"-"+(id-1));
-        eNoPercentage=document.getElementById("con-"+iCard+"-"+id);
-        yId=id-1;
+        yId=id.replace("-n","");
         nId=id;
+        eYesPercentage=document.getElementById("con-"+iCard+"-"+yId);
+        eNoPercentage=document.getElementById("con-"+iCard+"-"+nId);  
         eYesPercentage.value=(100-eNoPercentage.value);
     } 
 
@@ -529,6 +525,22 @@ function updateIterations(id,iCard){
 
 function updateDaily(iCard){
     const iTotalAPIS=totalAPIs(iCard);
+    const updateItem=aCards.find(item => item.flowId === iCard);     
+    Object.assign(updateItem,
+        {
+            flowId:iCard,
+            name:updateItem.name,
+            dailyAPI:iTotalAPIS,
+            runAPI:updateItem.runAPI,
+            actions:updateItem.actions,
+            daily:updateItem.daily,
+            solutionId:updateItem.solution,
+            on:updateItem.on,
+            guid:updateItem.guid,
+            containers:updateItem.containers
+        }
+    )
+
     const iDaily = Number(document.getElementById("daily-"+iCard).value);
     document.getElementById("apis-"+iCard).innerText=iTotalAPIS*iDaily;    
 ;}
@@ -536,26 +548,28 @@ function updateDaily(iCard){
 function updateTable(id){
     const sDaysOfWeek=getSelectedDays(id);
     const updateItem=aCards.find(item => item.flowId === id);  
-    const updatedData = aContainers.filter(item =>{return item.flow==id})
-    let iTotalActions=0;
-    updatedData.forEach(item =>{
-        iTotalActions+=item.actions
-    })    
-    Object.assign(updateItem,
-        {
-            flowId:id,
-            name:updateItem.name,
-            dailyAPI:Number(document.getElementById("apis-"+id).innerText),
-            runAPI:Number(document.getElementById("runs-"+id).innerText),
-            actions:iTotalActions,
-            daily:Number(document.getElementById("daily-"+id).value),
-            solution:eSolutionTitle.innerText,
-            on:true,
-            guid:createGuid(),
-            containers:updateItem.containers,
-            daysOfWeek:sDaysOfWeek
-        }
-    )
+    if(updateItem){
+        const updatedData = aContainers.filter(item =>{return item.flow==id});
+        let iTotalActions=0;
+        updatedData.forEach(item =>{
+            iTotalActions+=item.actions
+        })    
+        Object.assign(updateItem,
+            {
+                flowId:id,
+                name:updateItem.name,
+                dailyAPI:Number(document.getElementById("apis-"+id).innerText),
+                runAPI:Number(document.getElementById("runs-"+id).innerText),
+                actions:iTotalActions,
+                daily:Number(document.getElementById("daily-"+id).value),
+                solution:eSolutionTitle.innerText,
+                on:true,
+                guid:createGuid(),
+                containers:updateItem.containers,
+                daysOfWeek:sDaysOfWeek
+            }
+        )
+    }
     let sHTML="<table class='table'><tr><th>Flow</th><th>Run API's</th><th>Daily API's</th><th>Actions</th><th>Daily Runs</th><th>Days</th></tr>";
     aCards.forEach(item =>{
         const sRow="<tr><td>"+
@@ -574,30 +588,29 @@ function updateTable(id){
 }
 
 function loadSolution(id){
-
     const oSolution=aSolutions.find(item =>{return item.solutionId==id});
     console.log(oSolution)
     sSolution=oSolution.solutionId;
-    aCards=oSolution.flows;
-    aContainers.length=0;    
+    aCards.length=0;
+    aContainers.length=0; 
     eleftSection.innerHTML="";   
     eSolutionTitle.innerText=oSolution.solutionName;
-    aCards.forEach(card => {
-        addCard(card.flowId);
+    oSolution.flows.forEach(card => {
+        addCard(card);
         card.containers.forEach(item =>{
             console.log(item)
             let eActions;
             switch(item.type){
                 case "loop":
-                    addLoop(item.parent,card.flowId)
-                    const eLoop = document.getElementById("loop-"+card.flowId+"-"+item.parent);
-                    eActions=document.getElementById("action-"+card.flowId+"-"+item.parent);
+                    addLoop(item.parent,card.flowId,item)
+                    const eLoop = document.getElementById("loop-"+card.flowId+"-"+item.id);
+                    eActions=document.getElementById("action-"+card.flowId+"-"+item.id);
                     eLoop.value=item.iterations;                    
                     eActions.value=item.actions;
                     break;
                 case "condition":
                     if(item.branch=="yes"){
-                        addCondition(item.parent,card.flowId)
+                        addCondition(item.parent,card.flowId,item.id)
                         console.log("con-"+card.flowId+"-"+item.id)
                         const eCon = document.getElementById("con-"+card.flowId+"-"+item.id);
                         eActions=document.getElementById("action-"+card.flowId+"-"+item.id);
@@ -607,13 +620,14 @@ function loadSolution(id){
                     break
                 case "action":
                     eActions=document.getElementById("action-"+card.flowId);
-                    eActions.value=item.actions;
+                    console.log(eActions,"action-"+card.flowId)
+                    //eActions.value=item.actions;
                     break
             }
                 
         })
     })
-    closeOtherCards(1);
+    closeOtherCards(aCards[0].flowId);
     switchMode();
 }
 
@@ -658,6 +672,8 @@ function deleteCard(iCard){
     document.getElementById("card-"+iCard).remove();
     aContainers = aContainers.filter(item => item.flow != iCard);
     aCards=aCards.filter(item => item.flowId !=iCard);
+    document.getElementById("flow-count").innerText=aCards.length;
+    updateTable(iCard);
 }
 
 function deleteCondition(id,iCard){
@@ -713,7 +729,7 @@ function growCard(id) {
 }
 
 function closeOtherCards(id){
-    const aOtherCards=aCards.filter(item => {return item.flow!=id});
+    const aOtherCards=aCards.filter(item => {return item.flowId!=id});
     aOtherCards.forEach(item => {shrinkCard(item.flowId)});
 }
 
@@ -775,9 +791,8 @@ function newSolution(){
         containers:aContainers.slice(),
         daysOfWeek:"su|mo|tu|we|th|fr|sa"
     }];
-    iFlows=1;
     eleftSection.innerHTML="";
-    addCard(0)
+    addCard(aCards[0])
 
 }
 
