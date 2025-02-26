@@ -3,11 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="author" content="Untree.co">
+    <meta name="author" content="wyattdave">
     <link rel="shortcut icon" href="favicon.png">
-    <meta name="description" content="" />
+    <meta name="description" content="Utilizerd Power Automate accounts daily API limits" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
-    <!-- Bootstrap CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="css/tiny-slider.css" rel="stylesheet">
@@ -15,7 +14,14 @@
     <title>Flow Utilizer</title>
 </head> 
 <body>
-    <!-- Start Header/Navigation -->
+    <body>
+        <div id="splash-screen">
+            <img src="assets/img/power devbox grey.png" alt="Logo" id="splash-logo">
+            <div id="splash-text">
+                <h2>Flow Utilizer</h2>
+                <p>By Power DevBox</p>
+            </div>
+        </div>
     <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Power DevBox navigation bar">
         <div class="container">
             <img src="assets/img/power devbox grey.png" style="height:30px"><a class="navbar-brand" href="index.html">Power DevBox<span>.</span></a>
@@ -31,8 +37,6 @@
             </div>
         </div>				
     </nav>
-    <!-- End Header/Navigation -->
-    <!-- Start Why Choose Us Section -->
     <div id="main">
         <br>
         <div class="container-fluid" >
@@ -117,7 +121,11 @@
                     </div>
                     <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
                         <div class="card-body" >
-                            <h4 class="card-title" id="solutionTable-title">Solutions</h4>
+                            <h4 class="card-title" id="solutionTable-title">Solutions&nbsp;&nbsp;
+                                <Button type="button" class="btn btn-dark sm" id="import-solution" style="margin-left:20px">
+                                    <i class="fas fa-file-import"></i>
+                                </Button>
+                            </h4>
                             <div  id="left-table"></div>
                         </div>
                     </div>
@@ -188,13 +196,11 @@
             </div>
         </div>
     </div>
-    <!-- End Why Choose Us Section -->
-    <!-- Start Footer Section -->
     <div class="container relative">
         <div class="border-top copyright">
             <div class="row pt-4">
                 <div class="col-lg-6">
-                    <p class="mb-2 text-center text-lg-start">Copyright &copy;<script>document.write(new Date().getFullYear());</script>. All Rights Reserved. &mdash; Designed with love by <a href="https://untree.co">Untree.co</a>  <!-- License information: https://untree.co/license/ --> </p>
+                    <p class="mb-2 text-center text-lg-start">Copyright &copy;<script>document.write(new Date().getFullYear());</script>. All Rights Reserved. </p>
                 </div>
                 <div class="col-lg-6 text-center text-lg-end">
                     <ul class="list-unstyled d-inline-flex ms-auto">
@@ -206,17 +212,24 @@
             </div>
         </div>
     </div>
-<!-- End Footer Section -->	
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/tiny-slider.js"></script>
     <script src="js/custom.js"></script>
     <script type="text/javascript" src="assets/js/dev/calc.js"></script>
     <script type="text/javascript" src="assets/js/dev/ymal converter.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script>
-        if('serviceWorker' in navigator) {
-        
+         if('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service worker.js', { scope: '/' });
         }
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.body.classList.add('loaded');
+                setTimeout(function() {
+                    document.getElementById('splash-screen').style.display = 'none';
+                }, 2000);
+            }, 1000); 
+        });
     </script>
 </body>
 </html>

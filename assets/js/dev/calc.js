@@ -5,6 +5,7 @@ let sSolution=createGuid();
 let mode="main";
 let aRunningFlows=[];
 let sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
+let sCurrentFilter="all";
 
 const eTemplate=document.getElementById("card-0").cloneNode(true);
 const eAddLoop=document.getElementById("addLoop-button-0-0");
@@ -61,7 +62,8 @@ document.getElementById("grow-0").addEventListener('click',function () {growCard
 document.getElementById("daily-0").addEventListener('change',function () {updateDaily(0)});
 document.getElementById("title-0").addEventListener('input', (event) => {updateCardTitle(0)});
 document.getElementById("clear-filter").addEventListener('click',function () {updateSolutionTable("all")});
-document.getElementById("close-filter-days").addEventListener('click',closePopup)
+document.getElementById("close-filter-days").addEventListener('click',closePopup);
+document.getElementById("import-solution").addEventListener('click',importSolution);
 
 const aDaysOfWeekChecks = document.querySelectorAll("input[name='days-1']");
 aDaysOfWeekChecks.forEach( item =>{
@@ -81,6 +83,7 @@ function switchMode(){
         eMain.style.display="none";
         eSolution.style.display="block";
         eSwitch.innerText="View Flows";
+        sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
         mode="solution";
     }else{
         eSolution.style.display="none";
@@ -139,8 +142,11 @@ function addCard(oFlow){
 
     const aDaysOfWeek = eNewCard.querySelectorAll("input[name='days-0']");
     aDaysOfWeek.forEach( item =>{
-        item.name="days-"+oFlow.d;
+        item.name="days-"+oFlow.flowId;
         item.addEventListener('change',function () {updateCard(oFlow.flowId)});
+        if(!oFlow.daysOfWeek.includes(item.value)){
+            item.checked=false;
+        }
     })
     
     aContainers.push(
@@ -271,9 +277,15 @@ function addCondition(iCon,iCard,id){
 }
 
 function updateSolutionTable(sFilter){
+    if(sFilter=="all"){
+        sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
+    }
+    if(sFilter="days"){
+        sFilter=sCurrentFilter;
+    }
     aRunningFlows.length=0;
     let sTableSolutions="<table class='table'><tr><th>Solution</th><th>Flows</th><th>Daily APIS's</th><th>Modified</th><th></th></tr>";
-    let sTableFlows="<table class='table'><tr><th>Solution</th><th>Flow</th><th>Run API's</th><th>Daily APIS's</th><th>Include</th></tr>";
+    let sTableFlows="<table class='table'><tr><th>Solution</th><th>Flow</th><th>Run API's</th><th>Daily APIS's</th><th>Days Of Week</th><th>Include</th></tr>";
     aSolutions.forEach(sol =>{    
         let sRow="<tr><td id='solution-"+sol.solutionId+"'>"+
         sol.solutionName+"</td><td>"+
@@ -298,6 +310,7 @@ function updateSolutionTable(sFilter){
                     flow.name+"</td><td>"+
                     flow.runAPI+"</td><td>"+
                     flow.dailyAPI+"</td><td>"+
+                    flow.daysOfWeek+"</td><td>"+
                     "<div class='form-check form-switch'><input class='form-check-input' type='checkbox' role='switch' id='flow-"+flow.guid+"' checked><label class='form-check-label' for='flow-"+flow.guid+"'></label></div></td></tr>";
                     if(!flow.on){sRow=sRow.replace(" checked>",">")}
                     sTableFlows+=sRow
@@ -374,7 +387,6 @@ function updateCondition(id,iCard,branch){
     let iActions=0;
     let iYes=0;
     let iNo=0;
-    let iId=0;
     let yId="";
     let nId="";
     if(branch=="y"){
@@ -808,6 +820,33 @@ function downloadYaml(){
     downloadYaml(sYAML,eSolutionTitle.innerText+".yaml")
 }
 
+function importSolution(){
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.yaml, .yml';
+    input.onchange = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const text = await file.text();
+            const jsonObject = jsyaml.load(text);
+            if (jsonObject) {
+                const existingIndex = aSolutions.findIndex(item => item.solutionId == jsonObject.solutionId);
+                if (existingIndex !== -1) {
+                    aSolutions.splice(existingIndex, 1);
+                    alert("Solution with ID "+jsonObject.solutionId+" has been replaced.");
+                }
+                aSolutions.push(jsonObject);         
+                updateSolutionTable("all");
+                localStorage.setItem("solutions",JSON.stringify(aSolutions));
+            } else {
+                alert('Failed to parse YAML file.');
+            }
+        }
+    };
+    input.click();
+    input.remove()
+}
+
 function createGuid(){
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
     .replace(/[xy]/g, function (c) {
@@ -847,4 +886,5 @@ function closePopup() {
     sDaysOfWeekFilter=selectedDays.join('|') || '';
     console.log(sDaysOfWeekFilter)
     document.getElementById("daysPopup").style.display = "none";
+    updateSolutionTable("days");
 }

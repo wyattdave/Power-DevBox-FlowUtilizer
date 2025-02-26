@@ -3215,7 +3215,7 @@ textarea.form-control.is-invalid {
 }
 
 .btn:hover {
-    color: #212529
+    color: #585d61
 }
 
 .btn-check:focus+.btn,
@@ -3548,13 +3548,13 @@ fieldset:disabled .btn {
 
 .btn-dark {
     color: #fff;
-    background-color: #212529;
+    background-color: #2f2f2f;
     border-color: #212529
 }
 
 .btn-dark:hover {
     color: #fff;
-    background-color: #1c1f23;
+    background-color: #135bb9;
     border-color: #1a1e21
 }
 
