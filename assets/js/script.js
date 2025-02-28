@@ -21,7 +21,7 @@ let aEnvironmentVar=[];
 let sEnvironment="";
 let oDependencies;
 let bUpdate=false;
-let aExceptions=[];
+let aImportFlows=[];
 let aConnectors=[];
 let bFirstFlow=false;
 
@@ -53,8 +53,8 @@ async function selectFile() {
 }
 
 async function unpackNestedZipFiles(file) {
-  //try {
-    aExceptions=[];
+  try {
+    aImportFlows=[];
     aEnvironmentVar=[];
     aConnectors=[];
     bFirstFlow=true
@@ -83,6 +83,8 @@ async function unpackNestedZipFiles(file) {
             iDefinitionCount++;
           } else if (entry.filename.includes("customizations.xml")) {
             review(entry, "customizations", fileData),false;
+          } else if (entry.filename.includes("solution.xml")) {
+            review(entry, "solution", fileData,false);
           }
         }
       }
@@ -94,17 +96,129 @@ async function unpackNestedZipFiles(file) {
       }
 
       await zipReader.close();
-      console.log(aExceptions)
+      console.log(aImportFlows)
+      let bSave=true;
+      const existingIndex = aSolutions.findIndex(item => item.solutionId == oDependencies.ImportExportXml.SolutionManifest.UniqueName);
+      if (existingIndex !== -1) {
+        if (confirm('This upload will replace existing solution and wipe all iterations/mixes/days of week. Do you want to continue?')) {
+          aSolutions.splice(existingIndex, 1);
+        } else {
+          bSave=false;
+        }
+      }
+
+      if(bSave){
+        let aFlowCards=[];
+        aImportFlows.forEach((oFlow) => {
+          const aActions=oFlow.actionArray.filter(item =>{
+            return ( item.type!="Foreach" &&  item.type!="Switch" &&  item.type!="If" && item.type!="Until" )
+          })
+          const aContainers=oFlow.actionArray.filter(item =>{
+            return ( item.type=="Foreach" ||  item.type=="Switch"||  item.type=="If" ||  item.type=="Until") 
+          })
+          let aFlowContainers=[{
+            type:"action",
+            name:"Root Actions",
+            id: "0",
+            iterations:1,
+            parent:"0",
+            actions:aActions.filter(action =>{return action.parent=="root"}).length,
+            totalIterations:1,
+            branch:"yes",
+            flow:oFlow.id
+          }];
+          aContainers.forEach(item => {
+            let sParent=getParent(item,oFlow.actionArray);
+            if(sParent==undefined){sParent="0"}
+            aFlowContainers.push({
+              type:convertContainer(item.type),
+              name:item.name,
+              id: item.hashId,
+              iterations:0.5,
+              parent:sParent,
+              actions:aActions.filter(action =>{return action.parent==item.name}).length,
+              totalIterations:0.5,
+              branch:"yes",
+              flow:oFlow.id
+            })
+            if(convertContainer(item.type)=="condition"){
+              aFlowContainers.push({
+                type:convertContainer(item.type),
+                name:item.name,
+                id: item.hashId+"-n",
+                iterations:0.5,
+                parent:sParent,
+                actions:aActions.filter(action =>{return action.parent==item.name}).length,
+                totalIterations:0.5,
+                branch:"no",
+                flow:oFlow.id
+              })
+            }
+          })
+          aFlowCards.push({
+            flowId:oFlow.id,
+            name:oFlow.name,
+            dailyAPI:oFlow.actionArray.length,
+            runAPI:oFlow.actionArray.length,
+            actions:aActions.filter(action =>{return action.parent=="root"}).length,
+            daily:1,
+            solution:"Solution Name",
+            on:true,
+            guid:createGuid(),
+            containers:aFlowContainers.slice(),
+            daysOfWeek:"su|mo|tu|we|th|fr|sa"
+          }) ;
+        })
+    
+        aSolutions.push({
+          solutionName:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
+          solutionId:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
+          flows:aFlowCards,
+          dailyAPI:aFlowCards.reduce((sum, item) => sum + item.dailyAPI, 0),
+          modified:getNow()
+        });
+    
+        loadSolution(oDependencies.ImportExportXml.SolutionManifest.UniqueName);
+        switchMode();
+        localStorage.setItem("solutions",JSON.stringify(aSolutions));
+      }
     } else {
       alert("No a Zip file");
       console.log(file.name);
     }
- /// } catch (error) {
- ///   console.log(error.message);
-  ///  alert( "Unexpected Error: " + error.message);
- /// }
+  } catch (error) {
+    console.log(error.message);
+    alert( "Unexpected Error: " + error.message);
+ }
 }
 
+function getParent(object,array){
+  const oParent=array.find(item =>{return item.name==object.parent});
+  if(oParent==undefined){
+    console.log(object,array);
+    return 0
+  }
+  if (oParent.type=="Scope"){
+    getParent(oParent,array)
+  }else{
+    return oParent.hashId;
+  }
+}
+
+function convertContainer(sType){
+  switch(sType){
+    case "Foreach":
+      return "loop";
+    case "Switch":
+      return "condition";
+    case "If":
+      return "condition";
+    case "Until":
+      return "loop";
+    default:
+      return "Action";
+  }
+}
 ////processes files from zip
 async function review(entry, type, sDefinition,bExcept) {
   try {
@@ -144,7 +258,7 @@ async function review(entry, type, sDefinition,bExcept) {
           }
         }
         if(bExcept){
-          aExceptions.push(oReport);
+          aImportFlows.push(oReport);
         }
       }
     } else if (type == "customizations") {
@@ -217,7 +331,7 @@ async function review(entry, type, sDefinition,bExcept) {
           LanguageCode: sLanguageCode,
         };
 
-        aExceptions.forEach((oFlow) => {
+        aImportFlows.forEach((oFlow) => {
           if (oFlow.name == "unknown" && sCustomList != null) {
             let sFlowName;
             try {
@@ -234,6 +348,8 @@ async function review(entry, type, sDefinition,bExcept) {
             }
           }
         })
+    } else if (type == "solution") {
+      oDependencies = xmlToJson.parse(sDefinition);
     }
   } catch (error) {
     console.log(error)
