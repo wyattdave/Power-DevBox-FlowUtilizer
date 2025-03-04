@@ -53,7 +53,7 @@ async function selectFile() {
 }
 
 async function unpackNestedZipFiles(file) {
-  try {
+ // try {
     aImportFlows=[];
     aEnvironmentVar=[];
     aConnectors=[];
@@ -110,6 +110,13 @@ async function unpackNestedZipFiles(file) {
       if(bSave){
         let aFlowCards=[];
         aImportFlows.forEach((oFlow) => {
+          oFlow.actionArray.forEach((oAction) => {
+            const oParent=getParent(oAction,oFlow.actionArray,"");
+            oAction.parent=oParent.parent;
+            oAction.branch=oParent.branch;
+            oAction.parentId=oParent.parentId;
+          })
+
           const aActions=oFlow.actionArray.filter(item =>{
             return ( item.type!="Foreach" &&  item.type!="Switch" &&  item.type!="If" && item.type!="Until" )
           })
@@ -128,14 +135,13 @@ async function unpackNestedZipFiles(file) {
             flow:oFlow.id
           }];
           aContainers.forEach(item => {
-            let sParent=getParent(item,oFlow.actionArray);
-            if(sParent==undefined){sParent="0"}
+
             aFlowContainers.push({
               type:convertContainer(item.type),
               name:item.name,
               id: item.hashId,
               iterations:0.5,
-              parent:sParent,
+              parent:item.parentId,
               actions:aActions.filter(action =>{return action.parent==item.name}).length,
               totalIterations:0.5,
               branch:"yes",
@@ -147,7 +153,7 @@ async function unpackNestedZipFiles(file) {
                 name:item.name,
                 id: item.hashId+"-n",
                 iterations:0.5,
-                parent:sParent,
+                parent:item.parentId,
                 actions:aActions.filter(action =>{return action.parent==item.name}).length,
                 totalIterations:0.5,
                 branch:"no",
@@ -162,7 +168,7 @@ async function unpackNestedZipFiles(file) {
             runAPI:oFlow.actionArray.length,
             actions:aActions.filter(action =>{return action.parent=="root"}).length,
             daily:1,
-            solution:"Solution Name",
+            solution:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
             on:true,
             guid:createGuid(),
             containers:aFlowContainers.slice(),
@@ -186,22 +192,26 @@ async function unpackNestedZipFiles(file) {
       alert("No a Zip file");
       console.log(file.name);
     }
+    try{
   } catch (error) {
     console.log(error.message);
     alert( "Unexpected Error: " + error.message);
  }
 }
 
-function getParent(object,array){
+
+function getParent(object,array,parents){
+  if(object.parent=="Create_New_Site_2"){
+    console.log(parents)
+  }
   const oParent=array.find(item =>{return item.name==object.parent});
   if(oParent==undefined){
-    console.log(object,array);
-    return 0
+    return {"parentId":"0",parent:"0","branch":"Yes", "parents":"root|"+parents};
   }
   if (oParent.type=="Scope"){
-    getParent(oParent,array)
+    return getParent(oParent,array,parents+"|"+oParent.name)
   }else{
-    return oParent.hashId;
+    return {"parentId":oParent.hashId,"parent":oParent.name,"branch":oParent.branch, "parents":parents+"|"+oParent.name};
   }
 }
 
