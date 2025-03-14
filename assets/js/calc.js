@@ -7,6 +7,7 @@ let aRunningFlows=[];
 let sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
 let sCurrentFilter="all";
 let sSolutionFilterId="all";
+let bRefresh=false;
 
 const eTemplate=document.getElementById("card-0").cloneNode(true);
 const eAddLoop=document.getElementById("addLoop-button-0-0");
@@ -21,6 +22,8 @@ const eMain=document.getElementById("main");
 const eSolution=document.getElementById("solutions");
 const eSolutionDaily=document.getElementById("solution-daily");
 const eleftSection=document.getElementById("left-section");
+const eCharts=document.getElementById("charts");
+const eChartsButton=document.getElementById("chart-button");
 
 let aContainers=[{
     type:"action",
@@ -29,7 +32,7 @@ let aContainers=[{
     iterations:1,
     parent:"0",
     actions:1,
-    totalIterations:1,
+    totalCalls:1,
     branch:"yes",
     flow:"0"
 }];
@@ -37,24 +40,25 @@ let aContainers=[{
 let aCards=[{
     flowId:"0",
     name:"Flow 1",
-    dailyAPI:1,
-    runAPI:1,
+    dailyCalls:1,
+    runCalls:1,
     actions:1,
-    daily:1,
+    dailyRuns:1,
     solution:"Solution Name",
     on:true,
     containers:aContainers.slice(),
     daysOfWeek:"su|mo|tu|we|th|fr|sa"
 }];
 
-eAddCard.addEventListener("click", function () {addCard({})});
+eAddCard.addEventListener("click", function () {addCard({},{})});
 eSwitch.addEventListener("click", switchMode);
 eAddLoop.addEventListener("click", function () {addLoop("0","0",{})});
 eAddCondition.addEventListener("click", function () {addCondition("0","0",{},{})});
 eSolutionTitle.addEventListener('input', (event) => {updateTable(iCurrentCard)});
 eSaveSolution.addEventListener('click',function () {saveSolution()});
 eNewSolution.addEventListener('click',function () {newSolution()});
-document.getElementById("downloadYAML").addEventListener("click", downloadYaml);
+eChartsButton.addEventListener('click',switchChart);
+document.getElementById("downloadYAML").addEventListener("click", downloadSolution);
 document.getElementById("title-0").addEventListener('click',function () {updateCardTitle("0")});
 document.getElementById("action-0").addEventListener('change',function () {updateActions("0","0",true)});
 document.getElementById("delete-button-card-0").addEventListener('click',function () {deleteCard("0")});
@@ -65,6 +69,7 @@ document.getElementById("title-0").addEventListener('input', (event) => {updateC
 document.getElementById("clear-filter").addEventListener('click',function () {updateSolutionTable("all")});
 document.getElementById("close-filter-days").addEventListener('click',closePopup);
 document.getElementById("import-solution").addEventListener('click',importSolution);
+
 
 const aDaysOfWeekChecks = document.querySelectorAll("input[name='days-1']");
 aDaysOfWeekChecks.forEach( item =>{
@@ -92,23 +97,59 @@ function switchMode(){
         eMain.style.display="block";        
         eSwitch.innerText="View Solutions";
         mode="main";
+        eChartsButton.innerText="View Charts"; 
+        eCharts.style.display="none";
     }
 }
 
-function addCard(oFlow){
+function switchChart(){
+    if(mode=="charts"){
+        sCurrentFilter="all";
+        updateSolutionTable("all");
+        eCharts.style.display="none";
+        eSolution.style.display="block";
+        eSwitch.innerText="View Flows";
+        eChartsButton.innerText="View Charts"; 
+        sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
+        mode="solution";
+    }else{
+        loadCharts(bRefresh)
+        eSolution.style.display="none";
+        eMain.style.display="none";
+        eCharts.style.display="block";   
+        eSwitch.innerText="View Flows"; 
+        eChartsButton.innerText="View Solutions"; 
+        mode="charts";
+        bRefresh=true;
+    }
+}
+
+function addCard(oFlow,oContainer){
     if(JSON.stringify(oFlow)=="{}"){
         oFlow={
             name:"Flow "+(aCards.length+1),
             flowId:createGuid(),
-            dailyAPI:1,
-            runAPI:1,
+            dailyCalls:1,
+            runCalls:1,
             actions:1,
-            daily:1,
+            dailyRuns:1,
             solution:"Solution Name",
             on:true,
             containers:aContainers.slice(),
             daysOfWeek:"su|mo|tu|we|th|fr|sa"
         };
+    }   
+    if(JSON.stringify(oFlow)=="{}"){
+        oContainer={
+            type:"action",
+            name:"Root Actions",
+            id: createGuid(),
+            iterations:1,
+            parent:"0",
+            actions:1,
+            totalCalls:1,
+            card:oFlow.flowId
+        }
     }   
     document.getElementById("flow-count").innerText=aCards.length;
     const eNewCard=eTemplate.cloneNode(true);
@@ -137,9 +178,9 @@ function addCard(oFlow){
     document.getElementById("delete-button-card-"+oFlow.flowId).addEventListener('click',function () {deleteCard(oFlow.flowId)});
 
     document.getElementById("title-"+oFlow.flowId).innerText=oFlow.name;
-    document.getElementById("runs-"+oFlow.flowId).innerText=oFlow.runAPI;
-    document.getElementById("apis-"+oFlow.flowId).innerText=oFlow.dailyAPI;
-    document.getElementById("daily-"+oFlow.flowId).value=oFlow.daily;
+    document.getElementById("runs-"+oFlow.flowId).innerText=oFlow.runCalls;
+    document.getElementById("apis-"+oFlow.flowId).innerText=oFlow.dailyCalls;
+    document.getElementById("daily-"+oFlow.flowId).value=oFlow.dailyRuns;
 
     const aDaysOfWeek = eNewCard.querySelectorAll("input[name='days-0']");
     aDaysOfWeek.forEach( item =>{
@@ -150,24 +191,14 @@ function addCard(oFlow){
         }
     })
     
-    aContainers.push(
-        {
-            type:"action",
-            name:"Root Actions",
-            id: createGuid(),
-            iterations:1,
-            parent:"0",
-            actions:1,
-            totalIterations:1,
-            card:oFlow.flowId
-        }
-    );
+    aContainers.push(oContainer);
+    oFlow.aContainers=aContainers.slice();
     aCards.push(oFlow);
     updateTable(oFlow.flowId);
 }
 
 function addLoop(sLoop,sCard,oLoop){
-    const sLoopCount=aContainers.filter(item => item.type === "loop" && item.flow==sCard).length+1;   
+    const sLoopCount=aContainers.filter(item => item.type === "loop" && item.flow==sCard).length+1;  
     if(JSON.stringify(oLoop)=="{}"){
         oLoop= {
             type:"loop",
@@ -177,7 +208,7 @@ function addLoop(sLoop,sCard,oLoop){
             iterations:1,
             parent:sLoop,
             actions:1,
-            totalIterations:1,
+            totalCalls:1,
             flow:sCard,
             branch:"yes"
         }
@@ -206,6 +237,7 @@ function addLoop(sLoop,sCard,oLoop){
     totalAPIs(sCard);
     updateDaily(sCard);
     updateCard(sCard);
+    updateTable(sCard);
 }
 
 function addCondition(sCon,sCard,oCon,oCon2){
@@ -219,7 +251,7 @@ function addCondition(sCon,sCard,oCon,oCon2){
             iterations:0.5,
             parent:sCon,
             actions:1,
-            totalIterations:0.5,
+            totalCalls:0.5,
             flow:sCard,
             branch:"yes"
         }
@@ -233,7 +265,7 @@ function addCondition(sCon,sCard,oCon,oCon2){
             iterations:0.5,
             parent:sCon,
             actions:1,
-            totalIterations:0.5,
+            totalCalls:0.5,
             flow:sCard,
             branch:"no"
         }
@@ -255,7 +287,7 @@ function addCondition(sCon,sCard,oCon,oCon2){
     document.getElementById("addLoop-button-"+sCard+"-"+oCon.id).addEventListener('click',function () {addLoop(oCon.id,sCard,{})});
     document.getElementById("addCon-button-"+sCard+"-"+oCon.id).addEventListener('click',function () {addCondition(oCon.id,sCard,{},{})});
     document.getElementById("delete-button-"+sCard+"-"+oCon.id).addEventListener('click',function () {deleteCondition(oCon.id,sCard)});
-    document.getElementById("con-"+sCard+"-"+oCon.id).addEventListener('change',function () {updateConditionPercent(oCon.id,sCard,"y")});
+    document.getElementById("con-"+sCard+"-"+oCon.id).addEventListener('change',function () {updateCondition(oCon.id,sCard,"y")});
     document.getElementById("action-"+sCard+"-"+oCon.id).addEventListener('change',function () {updateCondition(oCon.id,sCard,"y")});
     document.getElementById("conTitle-"+sCard+"-"+oCon.id).addEventListener('input', (event) => {updateTitle(oCon.id,sCard,"con")});
 
@@ -274,7 +306,7 @@ function addCondition(sCon,sCard,oCon,oCon2){
     document.getElementById("actions-div-"+sCard+"-"+sCon).appendChild(container);
     document.getElementById("addLoop-button-"+sCard+"-"+oCon2.id).addEventListener('click',function () {addLoop(oCon2.id,sCard,{})});
     document.getElementById("addCon-button-"+sCard+"-"+oCon2.id).addEventListener('click',function () {addCondition(oCon2.id,sCard,{},{})});
-    document.getElementById("con-"+sCard+"-"+oCon2.id).addEventListener('change',function () {updateConditionPercent(oCon2.id,sCard,"n")});
+    document.getElementById("con-"+sCard+"-"+oCon2.id).addEventListener('change',function () {updateCondition(oCon2.id,sCard,"n")});
     document.getElementById("action-"+sCard+"-"+oCon2.id).addEventListener('change',function () {updateCondition(oCon2.id,sCard,"n")});
     aContainers.push(
         oCon,oCon2
@@ -282,8 +314,9 @@ function addCondition(sCon,sCard,oCon,oCon2){
     totalAPIs(sCard);
     updateDaily(sCard);
     updateCard(sCard);
+    updateTable(sCard);
 }
-
+let aFilteredFlows=[];
 function updateSolutionTable(sFilter){
     if(sFilter=="all"){
         sSolutionFilterId="all";
@@ -292,13 +325,14 @@ function updateSolutionTable(sFilter){
         sFilter=sSolutionFilterId;
     }
     aRunningFlows.length=0;
+    aFilteredFlows.length=0;
     let sTableSolutions="<table class='table'><tr><th>Solution</th><th>Flows</th><th>Daily APIS's</th><th>Modified</th><th></th></tr>";
     let sTableFlows="<table class='table'><tr><th>Solution</th><th>Flow</th><th>Run API's</th><th>Daily APIS's</th><th>Days Of Week</th><th>Include</th></tr>";
     aSolutions.forEach(sol =>{    
         let sRow="<tr><td id='solution-"+sol.solutionId+"'>"+
         sol.solutionName+"</td><td>"+
         sol.flows.length+"</td><td>"+
-        sol.dailyAPI+"</td><td>"+
+        sol.dailyCalls+"</td><td>"+
         sol.modified+"</td><td>"+
         "<Button class='btn btn-dark sm' id='delete-solution-"+sol.solutionId+"' style='margin-right:5px;'><i class='fa-solid fa-trash-can'></i></Button>"+
         "<Button class='btn btn-dark sm' id='filter-solution-"+sol.solutionId+"'><i class='fa-solid fa-filter'></i></Button>";
@@ -316,12 +350,13 @@ function updateSolutionTable(sFilter){
                     let sRow="<tr><td>"+
                     flow.solution+"</td><td>"+
                     flow.name+"</td><td>"+
-                    flow.runAPI+"</td><td>"+
-                    flow.dailyAPI+"</td><td>"+
+                    flow.runCalls+"</td><td>"+
+                    flow.dailyCalls+"</td><td>"+
                     flow.daysOfWeek+"</td><td>"+
                     "<div class='form-check form-switch'><input class='form-check-input' type='checkbox' role='switch' id='flow-"+flow.flowId+"' checked><label class='form-check-label' for='flow-"+flow.flowId+"'></label></div></td></tr>";
                     if(!flow.on){sRow=sRow.replace(" checked>",">")}
-                    sTableFlows+=sRow
+                    sTableFlows+=sRow;
+
                 }
             })
         }
@@ -363,7 +398,7 @@ function updateSolutionTable(sFilter){
 
 function updateTotals(){
     const aFilteredFlows=aRunningFlows.filter(item => item.on)
-    let sHTML="<p>Total Daily Runs:"+aFilteredFlows.reduce((sum, item) => sum + item.dailyAPI, 0)+
+    let sHTML="<p>Total Daily Runs:"+aFilteredFlows.reduce((sum, item) => sum + item.dailyCalls, 0)+
     "</p><p>Running Flows:"+aFilteredFlows.length+"</p>"
     document.getElementById("left-totals").innerHTML=sHTML;
 }
@@ -401,75 +436,51 @@ function updateTitle(id,sCard,type){
 }
 
 function updateCondition(id,sCard,branch){
-    let iActions=0;
+    
     let iYes=0;
     let iNo=0;
-    let yId="";
-    let nId="";
-    if(branch=="y"){
-        iActions=Number(document.getElementById("action-"+sCard+"-"+id).value);
-        iYes=iActions;   
-        iNo=aContainers.find(item => item.id === (id+"-n") && item.flow==sCard).totalIterations; 
-        nId=id+"-n";
-        yId=id;
-    }else if(branch=="n"){
-        iActions=Number(document.getElementById("action-"+sCard+"-"+id).value);
-        iYes=aContainers.find(item => item.id === (id.replace("-n","")) && item.flow==sCard).totalIterations;   
-        iNo=iActions; 
-        nId=id;
-        yId=id.replace("-n","");
-    } 
-    const updateItem=aContainers.find(item => item.id === id && item.flow==sCard);  
-    Object.assign(updateItem,
-        {
-            actions:Number(document.getElementById("action-"+sCard+"-"+id).value),
-            flow:sCard
-        }
-    )
-      
-    document.getElementById("conCalc-"+sCard+"-"+yId).innerText="Actions = Yes: "+iYes+", No:"+nId+", Condition:"+(iYes+iNo)/2;
-    updateDaily(sCard);
-}
-
-function updateConditionPercent(id,sCard,branch){
+    let sIdY="";
+    let sIdN="";
     let eYesPercentage;
     let eNoPercentage;
-    let yId="";
-    let nId="";
-    if(branch=="y"){
-        yId=id;
-        nId=id+"-n";
-        eYesPercentage=document.getElementById("con-"+sCard+"-"+yId);
-        eNoPercentage=document.getElementById("con-"+sCard+"-"+nId);     
-        eNoPercentage.value=(100-eYesPercentage.value);
-    }else if(branch=="n"){
-        yId=id.replace("-n","");
-        nId=id;
-        eYesPercentage=document.getElementById("con-"+sCard+"-"+yId);
-        eNoPercentage=document.getElementById("con-"+sCard+"-"+nId);  
-        eYesPercentage.value=(100-eNoPercentage.value);
-    } 
 
+    if(branch=="y"){
+        sIdN=id+"-n";
+        sIdY=id;
+ 
+    }else if(branch=="n"){
+        sIdN=id;
+        sIdY=id.replace("-n","");
+    } 
+    const iActionsY=Number(document.getElementById("action-"+sCard+"-"+sIdY).value);
+    const iActionsN=Number(document.getElementById("action-"+sCard+"-"+sIdN).value);
+    eYesPercentage=document.getElementById("con-"+sCard+"-"+sIdY);
+    eNoPercentage=document.getElementById("con-"+sCard+"-"+sIdN);  
+  
+    if(branch=="y"){
+        eNoPercentage.value=(100-eYesPercentage.value);
+    }else{
+        eYesPercentage.value=(100-eNoPercentage.value);
+    }
     if(Number(eYesPercentage.value)>100 || eNoPercentage.value<0){eYesPercentage.value=100;eNoPercentage.value=0}
     if(Number(eNoPercentage.value)>100 || eYesPercentage.value<0){eNoPercentage.value=100;eYesPercentage.value=0}
-    const updateItem=aContainers.find(item => item.id === yId);    
+    let updateItem=aContainers.find(item => item.id === sIdY && item.flow==sCard);  
     Object.assign(updateItem,
         {
             iterations:eYesPercentage.value/100,
-            actions:Number(document.getElementById("action-"+sCard+"-"+yId).value),
-            totalIterations:eYesPercentage.value/100,
-            flow:sCard,
+            actions:iActionsY,
+            totalCalls:Math.ceil((eYesPercentage.value/100)*iActionsY),
         }
     )
-    const updateItemN=aContainers.find(item => item.id === nId);    
-    Object.assign(updateItemN,
+    updateItem=aContainers.find(item => item.id ===  sIdN && item.flow==sCard);  
+    Object.assign(updateItem,
         {
             iterations:eNoPercentage.value/100,
-            actions:Number(document.getElementById("action-"+sCard+"-"+nId).value),
-            totalIterations:eNoPercentage.value/100,
-            flow:sCard,
+            actions:iActionsN,
+            totalCalls:Math.floor((eNoPercentage.value/100)*iActionsN),
         }
     )
+    document.getElementById("conCalc-"+sCard+"-"+sIdY).innerText="Actions = Yes: "+iActionsY+", No:"+iActionsN+", Condition:"+(Math.ceil((eYesPercentage.value/100)*iActionsY)+Math.floor((eNoPercentage.value/100)*iActionsN));
     updateDaily(sCard);
 }
 
@@ -508,7 +519,7 @@ function updateIterations(id,sCard){
         {
             id: id,
             iterations:Number(document.getElementById("loop-"+sCard+"-"+id).value),
-            totalIterations:Number(document.getElementById("loop-"+sCard+"-"+id).value),
+            totalCalls:Number(document.getElementById("loop-"+sCard+"-"+id).value),
             flow:sCard
         }
     )
@@ -517,6 +528,7 @@ function updateIterations(id,sCard){
 
 function updateDaily(sCard){
     const iTotalAPIS=totalAPIs(sCard);
+    updateTable(sCard);
     const updateItem=aCards.find(item => item.flowId === sCard);     
     Object.assign(updateItem,
         {
@@ -539,10 +551,10 @@ function updateTable(id){
         })    
         Object.assign(updateItem,
             {
-                dailyAPI:Number(document.getElementById("apis-"+id).innerText),
-                runAPI:Number(document.getElementById("runs-"+id).innerText),
+                dailyCalls:Number(document.getElementById("apis-"+id).innerText),
+                runCalls:Number(document.getElementById("runs-"+id).innerText),
                 actions:iTotalActions,
-                daily:Number(document.getElementById("daily-"+id).value),
+                dailyRuns:Number(document.getElementById("daily-"+id).value),
                 solution:eSolutionTitle.innerText,
                 daysOfWeek:sDaysOfWeek
             }
@@ -552,16 +564,16 @@ function updateTable(id){
     aCards.forEach(item =>{
         const sRow="<tr><td>"+
         item.name+"</td><td>"+
-        item.runAPI+"</td><td>"+
-        item.dailyAPI+"</td><td>"+
+        item.runCalls+"</td><td>"+
+        item.dailyCalls+"</td><td>"+
         item.actions+"</td><td>"+
-        item.daily+"</td><td>"+
+        item.dailyRuns+"</td><td>"+
         item.daysOfWeek+"</td></tr>";
         sHTML+=sRow;
     })
     sHTML+="</table>"
     eFlowTable.innerHTML=sHTML;
-    eSolutionDaily.innerText="Total Daily API: "+aCards.reduce((sum, item) => sum + item.dailyAPI, 0);
+    eSolutionDaily.innerText="Total Daily API: "+aCards.reduce((sum, item) => sum + item.dailyCalls, 0);
     
 }
 
@@ -574,7 +586,7 @@ function loadSolution(id){
     eleftSection.innerHTML="";   
     eSolutionTitle.innerText=oSolution.solutionName;
     oSolution.flows.forEach(card => {
-        addCard(card);
+       
         const aFlowContainers= card.containers.slice();
         aFlowContainers.forEach(item =>{
             let eActions;
@@ -589,8 +601,9 @@ function loadSolution(id){
                     }                   
                     break
                 case "action":
+                    addCard(card,item);
                     eActions=document.getElementById("action-"+card.flowId);
-                    //eActions.value=item.actions;
+                    eActions.value=item.actions;
                     break
             }
                 
@@ -604,18 +617,18 @@ function totalAPIs(sCard){
     const updatedData = aContainers.filter(item =>{return item.flow==sCard})
     let iTotalAPIS=0;
     updatedData.forEach(item =>{
-        iTotalAPIS+=(item.totalIterations*item.actions)
+        iTotalAPIS+=(item.totalCalls*item.actions)
     })    
     const aConditions = aContainers.filter(item =>{return item.flow==sCard && item.type=="condition"});
     iTotalAPIS+=aConditions.length/2;
 
     document.getElementById("runs-"+sCard).innerText=iTotalAPIS; 
-    updateTable(sCard);
+   
 
     return iTotalAPIS;
 }
 
-function updateTotalIterations(data) {
+function updateTotalCalls(data) {
     const map = data.reduce((acc, obj) => {
         acc[obj.id] = obj;
         return acc;
@@ -623,14 +636,14 @@ function updateTotalIterations(data) {
 
     data.forEach(obj => {
         if (obj.parent === 0) {
-        obj.totalIterations = obj.iterations;
+        obj.totalCalls = obj.iterations;
         } else {    
         const parent = map[obj.parent];
         if (parent) {
-            obj.totalIterations = obj.iterations * parent.totalIterations;
+            obj.totalCalls = obj.iterations * parent.totalCalls;
         } else {
             console.error(`Parent with ID ${obj.parent} not found for ID ${obj.id}`);
-            obj.totalIterations = obj.iterations; 
+            obj.totalCalls = obj.iterations; 
         }
         }
     });
@@ -718,7 +731,7 @@ function saveSolution(){
                 solutionName:eSolutionTitle.innerText,
                 solutionId:sSolution,
                 flows:aCards.slice(),
-                dailyAPI:aCards.reduce((sum, item) => sum + item.dailyAPI, 0),
+                dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
                 modified:getNow()
             }
         );
@@ -728,7 +741,7 @@ function saveSolution(){
             solutionName:eSolutionTitle.innerText,
             solutionId:sSolution,
             flows:aCards.slice(),
-            dailyAPI:aCards.reduce((sum, item) => sum + item.dailyAPI, 0),
+            dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
             modified:getNow()
         });
         alert(eSolutionTitle.innerText+" created")
@@ -748,38 +761,53 @@ function newSolution(){
         iterations:1,
         parent:"0",
         actions:1,
-        totalIterations:1,
+        totalCalls:1,
         flow:1,
         branch:"yes"
     }];
     const oCards={
         flowId:"0",
         name:"Flow 1",
-        dailyAPI:1,
-        runAPI:1,
+        dailyCalls:1,
+        runCalls:1,
         actions:1,
-        daily:1,
+        dailyRuns:1,
         solution:"Solution Name",
         on:true,
         containers:aContainers.slice(),
         daysOfWeek:"su|mo|tu|we|th|fr|sa"
     }
     eleftSection.innerHTML="";
-    addCard(oCards)
+    addCard(oCards,{})
 
 }
 
-function downloadYaml(){
+function downloadSolution(){
     const oSolution= {
         solutionName:eSolutionTitle.innerText,
         solutionId:sSolution,
         flows:aCards.slice(),
-        dailyAPI:aCards.reduce((sum, item) => sum + item.dailyAPI, 0),
+        dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
         modified:getNow()
     }
-    const sYAML=jsonToYaml(oSolution);
+    const sYAML=jsyaml.dump(oSolution);
     downloadYaml(sYAML,eSolutionTitle.innerText+".yaml")
 }
+
+function downloadYaml(yamlString, filename) {
+    const blob = new Blob([yamlString], { type: "text/yaml" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+
 
 function importSolution(){
     const input = document.createElement('input');

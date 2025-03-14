@@ -123,51 +123,98 @@ async function unpackNestedZipFiles(file) {
           const aContainers=oFlow.actionArray.filter(item =>{
             return ( item.type=="Foreach" ||  item.type=="Switch"||  item.type=="If" ||  item.type=="Until") 
           })
+          let iDaily=1;
+          if(oFlow.triggerNote.includes("Daily Runs:")){
+            iDaily=parseInt(oFlow.triggerNote.split("Daily Runs:")[1].split("|")[0].trim());
+          }
+
           let aFlowContainers=[{
             type:"action",
             name:"Root Actions",
             id: "0",
             iterations:1,
             parent:"0",
-            actions:aActions.filter(action =>{return action.parent=="root"}).length,
-            totalIterations:1,
+            actions:aActions.filter(action =>{return action.parentId=="0" }).length,
+            totalCalls:aActions.filter(action =>{return action.parentId=="0" }).length*iDaily,
             branch:"yes",
             flow:oFlow.id
           }];
-          aContainers.forEach(item => {
 
-            aFlowContainers.push({
-              type:convertContainer(item.type),
-              name:item.name,
-              id: item.hashId,
-              iterations:0.5,
-              parent:item.parentId,
-              actions:aActions.filter(action =>{return action.parent==item.name}).length,
-              totalIterations:0.5,
-              branch:"yes",
-              flow:oFlow.id
-            })
+          aContainers.forEach(item => {
+            let iIterations=1;
+            let iYes=.5;
+            let iNo=.5
             if(convertContainer(item.type)=="condition"){
+              if(item.notes.includes("Ratio:")){
+                const sRatio=oFlow.triggerNote.split("Iterations:")[1].split("|")[0];
+                if (sRatio.includes("/")){
+                  iYes=parseInt(sRatio.split("/")[0].trim());
+                  iNo=parseInt(sRatio.split("/")[1].trim());
+                }
+                if(iYes>1 || iNo>1){
+                  iYes=iYes/100;
+                  iNo=iNo/100;
+                }
+              }
+              const iActionsY=aActions.filter(action =>{return action.parent==item.name && (action.branch == "Yes" || action.branch=="")}).length;
+              const iActionsN=aActions.filter(action =>{return action.parent==item.name  && action.branch =="No"}).length;
+              aFlowContainers.push({
+                type:convertContainer(item.type),
+                name:item.name,
+                id: item.hashId,
+                iterations:iNo,
+                parent:item.parentId,
+                actions:iActionsY,
+                totalCalls:Math.ceil(iActionsY*iYes),
+                branch:"yes",
+                flow:oFlow.id
+              })
               aFlowContainers.push({
                 type:convertContainer(item.type),
                 name:item.name,
                 id: item.hashId+"-n",
-                iterations:0.5,
+                iterations:iNo,
                 parent:item.parentId,
-                actions:aActions.filter(action =>{return action.parent==item.name}).length,
-                totalIterations:0.5,
+                actions:iActionsN,
+                totalCalls:Math.floor(iActionsN*iNo),
                 branch:"no",
+                flow:oFlow.id
+              })
+            }else{
+
+              if(item.notes.includes("Iterations:")){
+                iIterations=parseInt(oFlow.triggerNote.split("Iterations:")[1].split("|")[0].trim());
+              }
+              aFlowContainers.push({
+                type:convertContainer(item.type),
+                name:item.name,
+                id: item.hashId,
+                iterations:iIterations,
+                parent:item.parentId,
+                actions:aActions.filter(action =>{return action.parent==item.name && (action.branch == "Yes" || action.branch=="")}).length,
+                totalCalls:iIterations*aActions.filter(action =>{return action.parent==item.name && (action.branch == "Yes" || action.branch=="")}).length,
+                branch:"yes",
                 flow:oFlow.id
               })
             }
           })
+
+            let iTotalAPIS=0;
+            aContainers.forEach(item =>{
+                iTotalAPIS+=(item.totalCalls*item.actions)
+            })    
+            const aConditions = aContainers.filter(item =>{return item.type=="condition"});
+            iTotalAPIS+=aConditions.length/2;
+
+
+
           aFlowCards.push({
             flowId:oFlow.id,
             name:oFlow.name,
-            dailyAPI:oFlow.actionArray.length,
-            runAPI:oFlow.actionArray.length,
+            dailyCalls:iDaily*iTotalAPIS,
+            runCalls:iTotalAPIS,
             actions:aActions.filter(action =>{return action.parent=="root"}).length,
-            daily:1,
+            dailyRuns:iDaily,
             solution:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
             on:true,
             guid:createGuid(),
@@ -180,7 +227,7 @@ async function unpackNestedZipFiles(file) {
           solutionName:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
           solutionId:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
           flows:aFlowCards,
-          dailyAPI:aFlowCards.reduce((sum, item) => sum + item.dailyAPI, 0),
+          dailyCalls:aFlowCards.reduce((sum, item) => sum + item.dailyCalls, 0),
           modified:getNow()
         });
     
@@ -206,12 +253,12 @@ function getParent(object,array,parents){
   }
   const oParent=array.find(item =>{return item.name==object.parent});
   if(oParent==undefined){
-    return {"parentId":"0",parent:"0","branch":"Yes", "parents":"root|"+parents};
+    return {"parentId":"0","parent":"root","branch":"Yes", "parents":"root|"+parents};
   }
   if (oParent.type=="Scope"){
     return getParent(oParent,array,parents+"|"+oParent.name)
   }else{
-    return {"parentId":oParent.hashId,"parent":oParent.name,"branch":oParent.branch, "parents":parents+"|"+oParent.name};
+    return {"parentId":oParent.hashId,"parent":oParent.name,"branch":object.branch, "parents":parents+"|"+oParent.name};
   }
 }
 

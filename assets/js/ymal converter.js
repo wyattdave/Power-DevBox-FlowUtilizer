@@ -14,6 +14,7 @@ function jsonToYaml(json, indent = 2, level = 0) {
             }
         }
     }
+    console.log( yamlString.trim().replaceAll("flows: - ","flows:").replaceAll("containers: - ","containers:").replaceAll(spacing+"- \n",":"));
     return yamlString.trim().replaceAll("flows: - ","flows:").replaceAll("containers: - ","containers:");
 };
 

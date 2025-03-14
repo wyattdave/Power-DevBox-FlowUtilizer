@@ -34,6 +34,7 @@ function CreateReview(
     let sTriggerExpress = "none";
     let sTriggerInputs = "none";
     let sTriggerRecur = "none";
+    let sTriggerNote = "none";
 
     if (sOwner == "" || sOwner == undefined) {
     sOwner = "please input";
@@ -96,6 +97,9 @@ function CreateReview(
         }
         if (value?.runtimeConfiguration != null) {
             sTriggerConfig = JSON.stringify(value.runtimeConfiguration);
+        }
+        if (sTrigger=="description") {
+            sTriggerNote = value;
         }
     });
 
@@ -475,6 +479,7 @@ function CreateReview(
         triggerExpress: sTriggerExpress,
         triggerInputs: sTriggerInputs,
         triggerRecur: sTriggerRecur,
+        triggerNote: sTriggerNote,
         premium: !aActionReturn.every((element) => element.tier === "Standard"),
         connectionRefs: aConnectionReturn.length,
         connectors: aApiList.length,
