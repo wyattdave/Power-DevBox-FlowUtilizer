@@ -34,7 +34,8 @@ let aContainers=[{
     actions:1,
     totalCalls:1,
     branch:"yes",
-    flow:"0"
+    flow:"0",
+    level:0
 }];
 
 let aCards=[{
@@ -46,7 +47,7 @@ let aCards=[{
     dailyRuns:1,
     solution:"Solution Name",
     on:true,
-    containers:aContainers.slice(),
+    containers:JSON.parse(JSON.stringify(aContainers)),
     daysOfWeek:"su|mo|tu|we|th|fr|sa"
 }];
 
@@ -135,11 +136,10 @@ function addCard(oFlow,oContainer){
             dailyRuns:1,
             solution:"Solution Name",
             on:true,
-            containers:aContainers.slice(),
+            containers:[],
             daysOfWeek:"su|mo|tu|we|th|fr|sa"
         };
-    }   
-    if(JSON.stringify(oFlow)=="{}"){
+
         oContainer={
             type:"action",
             name:"Root Actions",
@@ -148,7 +148,8 @@ function addCard(oFlow,oContainer){
             parent:"0",
             actions:1,
             totalCalls:1,
-            card:oFlow.flowId
+            flow:oFlow.flowId,
+            level:0
         }
     }   
     document.getElementById("flow-count").innerText=aCards.length;
@@ -192,12 +193,12 @@ function addCard(oFlow,oContainer){
     })
     
     aContainers.push(oContainer);
-    oFlow.aContainers=aContainers.slice();
+    oFlow.containers=JSON.parse(JSON.stringify(aContainers.filter(item => item.flow==oFlow.flowId)));
     aCards.push(oFlow);
     updateTable(oFlow.flowId);
 }
 
-function addLoop(sLoop,sCard,oLoop){
+function addLoop(sLoop,sCard,oLoop,iLevel){
     const sLoopCount=aContainers.filter(item => item.type === "loop" && item.flow==sCard).length+1;  
     if(JSON.stringify(oLoop)=="{}"){
         oLoop= {
@@ -210,7 +211,8 @@ function addLoop(sLoop,sCard,oLoop){
             actions:1,
             totalCalls:1,
             flow:sCard,
-            branch:"yes"
+            branch:"yes",
+            level:iLevel
         }
     }
     const container = document.createElement("div");
@@ -218,13 +220,13 @@ function addLoop(sLoop,sCard,oLoop){
     container.style.marginRight = "2px";
     container.id="actions-div-"+sCard+"-"+oLoop.id;
     container.className="card border-black mb-3";
-    container.innerHTML ="<p style='margin-left:"+(sLoop*10)+
+    container.innerHTML ="<p style='margin-left:"+(iLevel*10)+
     "px;'><span id='loopTitle-"+sCard+"-"+oLoop.id+"' contenteditable='true'>"+oLoop.name+"</span></p><p style='margin-left:"+(sLoop+1)*10+
-    "px;'>Iterations:<input id='loop-"+sCard+"-"+oLoop.id+"' type='number' value='1'/><Button class='btn btn-dark sm' id='addLoop-button-"+sCard+"-"+oLoop.id+
+    "px;'>Iterations:<input id='loop-"+sCard+"-"+oLoop.id+"' type='number' value='"+oLoop.iterations+"'/><Button class='btn btn-dark sm' id='addLoop-button-"+sCard+"-"+oLoop.id+
     "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+sCard+"-"+oLoop.id+
     "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+sCard+"-"+oLoop.id+
-    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(sLoop+1)*10+
-    "px;'>Child actions:<input id='action-"+sCard+"-"+oLoop.id+"' type='number' value='1'/></p>"
+    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iLevel+1)*10+
+    "px;'>Child actions:<input id='action-"+sCard+"-"+oLoop.id+"' type='number' value='"+oLoop.actions+"'/></p>"
 
     document.getElementById("actions-div-"+sCard+"-"+sLoop).appendChild(container);
     document.getElementById("addLoop-button-"+sCard+"-"+oLoop.id).addEventListener('click',function () {addLoop(oLoop.id,sCard,{})});
@@ -240,7 +242,7 @@ function addLoop(sLoop,sCard,oLoop){
     updateTable(sCard);
 }
 
-function addCondition(sCon,sCard,oCon,oCon2){
+function addCondition(sCon,sCard,oCon,oCon2,iLevel){
     const sConCount=(aContainers.filter(item => item.type === "condition" && item.flow==sCard).length/2)+1;
     if(JSON.stringify(oCon)=="{}"){
         oCon= {
@@ -253,7 +255,8 @@ function addCondition(sCon,sCard,oCon,oCon2){
             actions:1,
             totalCalls:0.5,
             flow:sCard,
-            branch:"yes"
+            branch:"yes",
+            level:iLevel
         }
     }
     if(JSON.stringify(oCon2)=="{}"){
@@ -267,7 +270,8 @@ function addCondition(sCon,sCard,oCon,oCon2){
             actions:1,
             totalCalls:0.5,
             flow:sCard,
-            branch:"no"
+            branch:"no",
+            level:iLevel
         }
     }
     let container = document.createElement("div");
@@ -275,17 +279,17 @@ function addCondition(sCon,sCard,oCon,oCon2){
     container.style.marginRight = "2px";
     container.id="actions-div-"+sCard+"-"+oCon.id;
     container.className="card border-black mb-3";
-    container.innerHTML ="<p style='margin-left:"+(sCon*10)+
+    container.innerHTML ="<p style='margin-left:"+(iLevel*10)+
     "px;'><span id='conTitle-"+sCard+"-"+oCon.id+"' contenteditable='true'>"+oCon.name+"</span>&nbsp;&nbsp;<span id='conCalc-"+sCard+"-"+oCon.id+"'>Yes: 0.5, No:0.5, Condition:1</span><p style='margin-left:"+(sCon+1)*10+
     "px;'>Yes %&nbsp;<input id='con-"+sCard+"-"+oCon.id+"' type='number' value='"+oCon.iterations*100+"' min='0' max='100'/><Button class='btn btn-dark sm' id='addLoop-button-"+sCard+"-"+oCon.id+
     "'><i class='fa-solid fa-retweet'></i></Button><Button class='btn btn-dark sm' id='addCon-button-"+sCard+"-"+oCon.id+
     "'><i class='fa-solid fa-arrow-right-arrow-left'></i></Button><Button class='btn btn-dark sm' id='delete-button-"+sCard+"-"+oCon.id+
-    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(sCon+1)*10+
+    "'><i class='fa-solid fa-trash-can'></i></Button></p><p style='margin-left:"+(iLevel+1)*10+
     "px;'>Yes child actions:&nbsp;<input id='action-"+sCard+"-"+oCon.id+"' type='number' value='"+oCon.actions+"'/></p>"
 
     document.getElementById("actions-div-"+sCard+"-"+sCon).appendChild(container);
-    document.getElementById("addLoop-button-"+sCard+"-"+oCon.id).addEventListener('click',function () {addLoop(oCon.id,sCard,{})});
-    document.getElementById("addCon-button-"+sCard+"-"+oCon.id).addEventListener('click',function () {addCondition(oCon.id,sCard,{},{})});
+    document.getElementById("addLoop-button-"+sCard+"-"+oCon.id).addEventListener('click',function () {addLoop(oCon.id,sCard,{},iLevel+1)});
+    document.getElementById("addCon-button-"+sCard+"-"+oCon.id).addEventListener('click',function () {addCondition(oCon.id,sCard,{},{},iLevel+1)});
     document.getElementById("delete-button-"+sCard+"-"+oCon.id).addEventListener('click',function () {deleteCondition(oCon.id,sCard)});
     document.getElementById("con-"+sCard+"-"+oCon.id).addEventListener('change',function () {updateCondition(oCon.id,sCard,"y")});
     document.getElementById("action-"+sCard+"-"+oCon.id).addEventListener('change',function () {updateCondition(oCon.id,sCard,"y")});
@@ -304,8 +308,8 @@ function addCondition(sCon,sCard,oCon,oCon2){
     "px;'>No child actions&nbsp;<input id='action-"+sCard+"-"+oCon2.id+"' type='number' value='"+oCon2.actions+"' style='width:90px'/></p>"
 
     document.getElementById("actions-div-"+sCard+"-"+sCon).appendChild(container);
-    document.getElementById("addLoop-button-"+sCard+"-"+oCon2.id).addEventListener('click',function () {addLoop(oCon2.id,sCard,{})});
-    document.getElementById("addCon-button-"+sCard+"-"+oCon2.id).addEventListener('click',function () {addCondition(oCon2.id,sCard,{},{})});
+    document.getElementById("addLoop-button-"+sCard+"-"+oCon2.id).addEventListener('click',function () {addLoop(oCon2.id,sCard,{},iLevel+1)});
+    document.getElementById("addCon-button-"+sCard+"-"+oCon2.id).addEventListener('click',function () {addCondition(oCon2.id,sCard,{},{},iLevel+1)});
     document.getElementById("con-"+sCard+"-"+oCon2.id).addEventListener('change',function () {updateCondition(oCon2.id,sCard,"n")});
     document.getElementById("action-"+sCard+"-"+oCon2.id).addEventListener('change',function () {updateCondition(oCon2.id,sCard,"n")});
     aContainers.push(
@@ -586,18 +590,17 @@ function loadSolution(id){
     eleftSection.innerHTML="";   
     eSolutionTitle.innerText=oSolution.solutionName;
     oSolution.flows.forEach(card => {
-       
-        const aFlowContainers= card.containers.slice();
+        const aFlowContainers= JSON.parse(JSON.stringify(card.containers));
         aFlowContainers.forEach(item =>{
             let eActions;
             switch(item.type){
                 case "loop":
-                    addLoop(item.parent,card.flowId,item)
+                    addLoop(item.parent,card.flowId,item,item.level)
                     break;
                 case "condition":
                     if(item.branch=="yes"){
                         const itemN=aFlowContainers.find(con => con.id==(item.id+"-n"));
-                        addCondition(item.parent,card.flowId,item,itemN)
+                        addCondition(item.parent,card.flowId,item,itemN,item.level)
                     }                   
                     break
                 case "action":
@@ -730,7 +733,7 @@ function saveSolution(){
             {
                 solutionName:eSolutionTitle.innerText,
                 solutionId:sSolution,
-                flows:aCards.slice(),
+                flows:JSON.parse(JSON.stringify(aCards)),
                 dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
                 modified:getNow()
             }
@@ -740,7 +743,7 @@ function saveSolution(){
         aSolutions.push({
             solutionName:eSolutionTitle.innerText,
             solutionId:sSolution,
-            flows:aCards.slice(),
+            flows:JSON.parse(JSON.stringify(aCards)),
             dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
             modified:getNow()
         });
@@ -774,7 +777,7 @@ function newSolution(){
         dailyRuns:1,
         solution:"Solution Name",
         on:true,
-        containers:aContainers.slice(),
+        containers:JSON.parse(JSON.stringify(aContainers)),
         daysOfWeek:"su|mo|tu|we|th|fr|sa"
     }
     eleftSection.innerHTML="";
@@ -786,11 +789,12 @@ function downloadSolution(){
     const oSolution= {
         solutionName:eSolutionTitle.innerText,
         solutionId:sSolution,
-        flows:aCards.slice(),
+        flows:JSON.parse(JSON.stringify(aCards)),
         dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
         modified:getNow()
     }
-    const sYAML=jsyaml.dump(oSolution);
+    console.log(oSolution)
+    const sYAML=jsyaml.dump(oSolution,{noRefs:true});
     downloadYaml(sYAML,eSolutionTitle.innerText+".yaml")
 }
 
@@ -847,12 +851,9 @@ function createGuid(){
 
 function getNow(){
     const dtNow=new Date();
-
     const sNow= String(dtNow.getDay()).padStart(2, '0')+"/"+String(dtNow.getMonth()+1).padStart(2, '0')+
     " - "+String(dtNow.getHours()).padStart(2, '0')+
     ":"+String(dtNow.getMinutes()).padStart(2, '0');
-
-    console.log(sNow)
     return sNow
 }
 

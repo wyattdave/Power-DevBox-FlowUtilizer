@@ -144,6 +144,9 @@ async function unpackNestedZipFiles(file) {
             let iIterations=1;
             let iYes=.5;
             let iNo=.5
+            const iLevel=item.positionIndex.split("|").length-1;
+            const sId=item.hashId.replace("MISSING",oFlow.id);
+            const sParentId=item.parentId.replace("MISSING",oFlow.id)
             if(convertContainer(item.type)=="condition"){
               if(item.notes.includes("Ratio:")){
                 const sRatio=oFlow.triggerNote.split("Iterations:")[1].split("|")[0];
@@ -161,24 +164,26 @@ async function unpackNestedZipFiles(file) {
               aFlowContainers.push({
                 type:convertContainer(item.type),
                 name:item.name,
-                id: item.hashId,
+                id: sId,
                 iterations:iNo,
-                parent:item.parentId,
+                parent:sParentId,
                 actions:iActionsY,
                 totalCalls:Math.ceil(iActionsY*iYes),
                 branch:"yes",
-                flow:oFlow.id
+                flow:oFlow.id,
+                level:iLevel
               })
               aFlowContainers.push({
                 type:convertContainer(item.type),
                 name:item.name,
-                id: item.hashId+"-n",
+                id: sId+"-n",
                 iterations:iNo,
-                parent:item.parentId,
+                parent:sParentId,
                 actions:iActionsN,
                 totalCalls:Math.floor(iActionsN*iNo),
                 branch:"no",
-                flow:oFlow.id
+                flow:oFlow.id,
+                level:iLevel
               })
             }else{
 
@@ -188,13 +193,14 @@ async function unpackNestedZipFiles(file) {
               aFlowContainers.push({
                 type:convertContainer(item.type),
                 name:item.name,
-                id: item.hashId,
+                id: sId,
                 iterations:iIterations,
-                parent:item.parentId,
-                actions:aActions.filter(action =>{return action.parent==item.name && (action.branch == "Yes" || action.branch=="")}).length,
+                parent:sParentId,
+                actions:aActions.filter(action =>{return action.parent==item.name}).length,
                 totalCalls:iIterations*aActions.filter(action =>{return action.parent==item.name && (action.branch == "Yes" || action.branch=="")}).length,
                 branch:"yes",
-                flow:oFlow.id
+                flow:oFlow.id,
+                level:iLevel
               })
             }
           })
@@ -206,8 +212,6 @@ async function unpackNestedZipFiles(file) {
             const aConditions = aContainers.filter(item =>{return item.type=="condition"});
             iTotalAPIS+=aConditions.length/2;
 
-
-
           aFlowCards.push({
             flowId:oFlow.id,
             name:oFlow.name,
@@ -217,12 +221,12 @@ async function unpackNestedZipFiles(file) {
             dailyRuns:iDaily,
             solution:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
             on:true,
-            guid:createGuid(),
             containers:aFlowContainers.slice(),
             daysOfWeek:"su|mo|tu|we|th|fr|sa"
           }) ;
+          console.log(aFlowCards)
         })
-    
+
         aSolutions.push({
           solutionName:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
           solutionId:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
