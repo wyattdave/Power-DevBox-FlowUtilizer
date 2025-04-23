@@ -1,4 +1,3 @@
-let iElementAutoHeight=0
 let iCurrentCard=0;
 let aSolutions=[];
 let sSolution=createGuid();
@@ -24,6 +23,8 @@ const eSolutionDaily=document.getElementById("solution-daily");
 const eleftSection=document.getElementById("left-section");
 const eCharts=document.getElementById("charts");
 const eChartsButton=document.getElementById("chart-button");
+const eFlowLicense=document.getElementById("flow-icon");
+const ePremiumLicense=document.getElementById("premium-icon");
 
 let aContainers=[{
     type:"action",
@@ -84,46 +85,7 @@ if(!localStorage.getItem("solutions")){
     aSolutions=JSON.parse(localStorage.getItem("solutions"));
 }
 
-function switchMode(){
-    if(mode=="main"){
-        sCurrentFilter="all";
-        updateSolutionTable("all");
-        eMain.style.display="none";
-        eSolution.style.display="block";
-        eSwitch.innerText="View Flows";
-        sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
-        mode="solution";
-    }else{
-        eSolution.style.display="none";
-        eMain.style.display="block";        
-        eSwitch.innerText="View Solutions";
-        mode="main";
-        eChartsButton.innerText="View Charts"; 
-        eCharts.style.display="none";
-    }
-}
 
-function switchChart(){
-    if(mode=="charts"){
-        sCurrentFilter="all";
-        updateSolutionTable("all");
-        eCharts.style.display="none";
-        eSolution.style.display="block";
-        eSwitch.innerText="View Flows";
-        eChartsButton.innerText="View Charts"; 
-        sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
-        mode="solution";
-    }else{
-        loadCharts(bRefresh)
-        eSolution.style.display="none";
-        eMain.style.display="none";
-        eCharts.style.display="block";   
-        eSwitch.innerText="View Flows"; 
-        eChartsButton.innerText="View Solutions"; 
-        mode="charts";
-        bRefresh=true;
-    }
-}
 
 function addCard(oFlow,oContainer){
     if(JSON.stringify(oFlow)=="{}"){
@@ -311,8 +273,8 @@ function addCondition(sCon,sCard,oCon,oCon2,iLevel){
     updateCondition(oCon.id,sCard,"y")
 }
 
-let aFilteredFlows=[];
 function updateSolutionTable(sFilter){
+    let aFilteredFlows=[];
     if(sFilter=="all"){
         sSolutionFilterId="all";
     }
@@ -321,9 +283,10 @@ function updateSolutionTable(sFilter){
     }
     aRunningFlows.length=0;
     aFilteredFlows.length=0;
-    let sTableSolutions="<table class='table'><tr><th>Solution</th><th>Flows</th><th>Daily APIS's</th><th>Modified</th><th></th></tr>";
-    let sTableFlows="<table class='table'><tr><th>Solution</th><th>Flow</th><th>Run API's</th><th>Daily APIS's</th><th>Days Of Week</th><th>Include</th></tr>";
+    let sTableSolutions="<table class='table'><tr><th>Solution</th><th>Flows</th><th>Daily Calls</th><th>Modified</th><th></th></tr>";
+    let sTableFlows="<table class='table'><tr><th>Solution</th><th>Flow</th><th>Run Calls</th><th>Daily Calls</th><th>Days Of Week</th><th>Include</th></tr>";
     aSolutions.forEach(sol =>{    
+        sol.dailyCalls=sol.flows.reduce((sum, item) => sum + item.dailyCalls, 0);
         let sRow="<tr><td id='solution-"+sol.solutionId+"'>"+
         sol.solutionName+"</td><td>"+
         sol.flows.length+"</td><td>"+
@@ -342,9 +305,16 @@ function updateSolutionTable(sFilter){
                     }
                 })
                 if(bDayFound){
+                    let sLicense="";
+                    if(flow.dailyCalls>5000){
+                        sLicense="<img src='assets/img/premium diamond.svg' class='license-Small'>"
+                    }
+                    if(flow.dailyCalls>40000){
+                        sLicense="<img src='assets/img/classic flow.svg' class='license-Small'>"
+                    }
                     let sRow="<tr><td>"+
                     flow.solution+"</td><td>"+
-                    flow.name+"</td><td>"+
+                    sLicense+flow.name+"</td><td>"+
                     flow.runCalls+"</td><td>"+
                     flow.dailyCalls+"</td><td>"+
                     flow.daysOfWeek+"</td><td>"+
@@ -392,10 +362,22 @@ function updateSolutionTable(sFilter){
 }
 
 function updateTotals(){
-    const aFilteredFlows=aRunningFlows.filter(item => item.on)
-    let sHTML="<p>Total Daily Runs:"+aFilteredFlows.reduce((sum, item) => sum + item.dailyCalls, 0)+
+    const aFilteredFlows=aRunningFlows.filter(item => item.on);
+    const iTotalCalls=aFilteredFlows.reduce((sum, item) => sum + item.dailyCalls, 0);
+    let sHTML="<p>Total Daily Runs:"+iTotalCalls+
     "</p><p>Running Flows:"+aFilteredFlows.length+"</p>"
     document.getElementById("left-totals").innerHTML=sHTML;
+    if(iTotalCalls>5000){
+        ePremiumLicense.style="display:block"
+    }else{
+        ePremiumLicense.style.style="display:none"
+    }
+    if(iTotalCalls>40000){
+        eFlowLicense.style.style="display:block"
+    }else{
+        eFlowLicense.style.style="display:none"
+    };
+
 }
 
 function deleteSolution(id){
@@ -493,7 +475,6 @@ function updateLoops(id,sCard){
     updateCard(sCard);    
 }
 
-
 function updateActions(id,sCard,root){
     const updateItem=aContainers.find(item => item.id === id);    
     let iActions=0;
@@ -513,12 +494,10 @@ function updateActions(id,sCard,root){
 
 function updateCard(sCard){
     const updateItem=aCards.find(item => item.flowId === sCard);  
-
     const sDaysOfWeek=getSelectedDays(sCard);
     let iTotalActions=0;
     const aFlowContainers=aContainers.filter(item => item.flow==sCard && item.type!="action");
     aFlowContainers.sort((a, b) => b.level - a.level);
-    console.log(aFlowContainers)
     aFlowContainers.forEach(item =>{
         let iAdd=0
         if(item.type!="action" && item.branch!="n"){iAdd=1}
@@ -529,7 +508,6 @@ function updateCard(sCard){
             }
         )
     })
-    console.log(aFlowContainers)
     aFlowContainers.forEach(item =>{
        console.log(item)
         const updateItem=aFlowContainers.find(action => item.parent==action.id);
@@ -539,8 +517,8 @@ function updateCard(sCard){
             console.log(iCombinedCalls)
             Object.assign(updateItem,
                 {
-                    totalCalls:iCombinedCalls
-
+                    totalCalls:Math.ceil(iCombinedCalls),
+                    dailyCalls:Math.ceil(updateItem.dailyCalls)
                 }
             )
         }
@@ -565,7 +543,6 @@ function updateCard(sCard){
     document.getElementById("runs-"+sCard).innerText=iTotalActions;  
     updateTable(sCard);
 }
-
 
 function updateTable(sCard){
     const sDaysOfWeek=getSelectedDays(sCard);
@@ -602,7 +579,6 @@ function updateTable(sCard){
     eFlowTable.innerHTML=sHTML;
     eSolutionDaily.innerText="Total Daily API: "+aCards.reduce((sum, item) => sum + item.dailyCalls, 0);    
 }
-
 
 function getTotalCalls(id,sCard,iTotalCalls) {
     const aContainers=aCards.find(item => item.flowId === sCard).containers; 
@@ -668,61 +644,6 @@ function deleteContainer(id,sCard){
     document.getElementById("actions-div-"+sCard+"-"+id).remove();
     getChildAndDelete(id,sCard);
     updateCard(sCard);
-}
-
-function getChildAndDelete(id,sCard){
-    aContainers = aContainers.filter(item => item.id !== id);
-    const aDelete=aContainers.filter(item => item.parent === id && item.flow==sCard); 
-    aDelete.forEach(item =>{    
-        getChildAndDelete(item.id,sCard)
-    })
-}
-
-function getSelectedDays(sCard) {
-    const checkboxes = document.querySelectorAll("input[name='days-"+sCard+"']:checked");
-    const selectedDays = Array.from(checkboxes).map(checkbox => checkbox.value);
-    return selectedDays.join('|') || '';
-}
-
-function shrinkCard(id) {   
-    document.getElementById("shrink-"+id).style.display = "none";
-    document.getElementById("grow-"+id).style.display = "";
-    const actionsDiv = document.getElementById("actions-div-"+id+"-0");
-    
-    iElementAutoHeight=actionsDiv.scrollHeight ;
-    actionsDiv.style.height = actionsDiv.offsetHeight + "px";
-
-    requestAnimationFrame(() => {
-        actionsDiv.style.transition = "height 0.5s ease";
-        actionsDiv.style.height = "100px";
-        actionsDiv.style.overflow = "hidden";
-    });   
-}
-
-function growCard(id) {
-    iCurrentCard=id
-    document.getElementById("grow-"+id).style.display = "none";
-    document.getElementById("shrink-"+id).style.display = "";
-    const actionsDiv = document.getElementById("actions-div-"+id+"-0");
-    actionsDiv.addEventListener("transitionend", onTransitionEnd);
-    requestAnimationFrame(() => {
-        actionsDiv.style.transition = "height 0.5s ease";
-        actionsDiv.style.height=iElementAutoHeight+"px";        
-    });
-    closeOtherCards(id);
-}
-
-function closeOtherCards(id){
-    const aOtherCards=aCards.filter(item => {return item.flowId!=id});
-    aOtherCards.forEach(item => {shrinkCard(item.flowId)});
-}
-
-function onTransitionEnd(event) {
-    if (event.propertyName === "height") { 
-        const box = event.target;        
-        box.removeEventListener("transitionend", onTransitionEnd);
-        box.style.height = "auto";
-    }
 }
 
 function saveSolution(){
@@ -809,8 +730,6 @@ function downloadYaml(yamlString, filename) {
     URL.revokeObjectURL(url);
 }
 
-
-
 function importSolution(){
     const input = document.createElement('input');
     input.type = 'file';
@@ -836,6 +755,106 @@ function importSolution(){
     };
     input.click();
     input.remove()
+}
+
+function shrinkCard(id) {   
+    document.getElementById("shrink-"+id).style.display = "none";
+    document.getElementById("grow-"+id).style.display = "";
+    const actionsDiv = document.getElementById("actions-div-"+id+"-0");
+    
+    const iElementAutoHeight=actionsDiv.scrollHeight ;
+    actionsDiv.style.height = actionsDiv.offsetHeight + "px";
+
+    requestAnimationFrame(() => {
+        actionsDiv.style.transition = "height 0.5s ease";
+        actionsDiv.style.height = "100px";
+        actionsDiv.style.overflow = "hidden";
+    });   
+}
+
+function growCard(id) {
+    iCurrentCard=id
+    document.getElementById("grow-"+id).style.display = "none";
+    document.getElementById("shrink-"+id).style.display = "";
+    const actionsDiv = document.getElementById("actions-div-"+id+"-0");
+    const iCurrentHeight = actionsDiv.offsetHeight;
+    actionsDiv.style.height = "auto";
+    const iElementAutoHeight = actionsDiv.scrollHeight;
+    actionsDiv.style.height = iCurrentHeight+"px";
+    actionsDiv.addEventListener("transitionend", onTransitionEnd);
+    requestAnimationFrame(() => {
+        actionsDiv.style.transition = "height 0.5s ease";
+        actionsDiv.style.height=iElementAutoHeight+"px";        
+    });
+    closeOtherCards(id);
+}
+
+function closeOtherCards(id){
+    const aOtherCards=aCards.filter(item => {return item.flowId!=id});
+    aOtherCards.forEach(item => {shrinkCard(item.flowId)});
+}
+
+function onTransitionEnd(event) {
+    if (event.propertyName === "height") { 
+        const box = event.target;        
+        box.removeEventListener("transitionend", onTransitionEnd);
+        box.style.height = "auto";
+    }
+}
+
+function switchMode(){
+    if(mode=="main"){
+        sCurrentFilter="all";
+        updateSolutionTable("all");
+        eMain.style.display="none";
+        eSolution.style.display="block";
+        eSwitch.innerText="View Flows";
+        sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
+        mode="solution";
+    }else{
+        eSolution.style.display="none";
+        eMain.style.display="block";        
+        eSwitch.innerText="View Solutions";
+        mode="main";
+        eChartsButton.innerText="View Charts"; 
+        eCharts.style.display="none";
+    }
+}
+
+function switchChart(){
+    if(mode=="charts"){
+        sCurrentFilter="all";
+        updateSolutionTable("all");
+        eCharts.style.display="none";
+        eSolution.style.display="block";
+        eSwitch.innerText="View Flows";
+        eChartsButton.innerText="View Charts"; 
+        sDaysOfWeekFilter="su|mo|tu|we|th|fr|sa";
+        mode="solution";
+    }else{
+        loadCharts(bRefresh)
+        eSolution.style.display="none";
+        eMain.style.display="none";
+        eCharts.style.display="block";   
+        eSwitch.innerText="View Flows"; 
+        eChartsButton.innerText="View Solutions"; 
+        mode="charts";
+        bRefresh=true;
+    }
+}
+
+function getChildAndDelete(id,sCard){
+    aContainers = aContainers.filter(item => item.id !== id);
+    const aDelete=aContainers.filter(item => item.parent === id && item.flow==sCard); 
+    aDelete.forEach(item =>{    
+        getChildAndDelete(item.id,sCard)
+    })
+}
+
+function getSelectedDays(sCard) {
+    const checkboxes = document.querySelectorAll("input[name='days-"+sCard+"']:checked");
+    const selectedDays = Array.from(checkboxes).map(checkbox => checkbox.value);
+    return selectedDays.join('|') || '';
 }
 
 function createGuid(){

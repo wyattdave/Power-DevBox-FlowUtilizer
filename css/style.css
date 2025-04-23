@@ -20,6 +20,22 @@
   transition: opacity 2s ease-out; 
 }
 
+.license{
+  position: absolute;
+  top: 0; 
+  right: 0;
+}
+
+.license-Big{
+  width:50px;
+  height:50px;
+}
+
+.license-Small{
+  width:20px;
+  height:20px;
+}
+
 #splash-logo {
   width: 150px;
   height: auto;
