@@ -718,6 +718,35 @@ function downloadSolution(){
     downloadYaml(sYAML,eSolutionTitle.innerText+".yaml")
 }
 
+
+// Close the modal
+document.getElementById("close-modal").addEventListener("click", function () {
+    document.getElementById("close-modal").style.display = "none";
+});
+
+// Confirm account name and trigger download
+document.getElementById("confirm-account-button").addEventListener("click", function () {
+    const accountName = document.getElementById("account-name-input").value.trim();
+    if (!accountName) {
+        alert("Please enter an account name.");
+        return;
+    }
+    document.getElementById("modal").style.display = "none";
+    downloadAccount(accountName);
+});
+
+// Open the account name modal when the confirm-account-name button is clicked
+document.getElementById("download-account-button").addEventListener("click", function () {
+    const accountNameModal = document.getElementById("modal");
+    accountNameModal.style.display = "flex"; // Show the modal
+});
+
+// Update the downloadAccount function
+function downloadAccount(accountName) {
+    const sYAML = jsyaml.dump(aSolutions, { noRefs: true });
+    downloadYaml(sYAML, accountName + ".yaml");
+}
+
 function downloadYaml(yamlString, filename) {
     const blob = new Blob([yamlString], { type: "text/yaml" });
     const url = URL.createObjectURL(blob);
@@ -788,6 +817,7 @@ function growCard(id) {
     });
     closeOtherCards(id);
 }
+
 
 function closeOtherCards(id){
     const aOtherCards=aCards.filter(item => {return item.flowId!=id});

@@ -132,6 +132,7 @@
                                 <Button type="button" class="btn btn-dark sm" id="import-solution" style="margin-left:20px">
                                     <i class="fas fa-file-import"></i>
                                 </Button>
+                                <button class="btn btn-dark sm" id="download-account-button">Download Account</button>
                             </h4>
                             <div  id="left-table"></div>
                         </div>
@@ -140,6 +141,7 @@
                 <div class="col-lg-7 col-md-12 col-sm-12" >
                     <div class="card">
                         <div class="card-body">
+                            
                             <h4 class="card-title" id="solutionFlowTable-title">Flows&nbsp;&nbsp;
                                 <Button type="button" class="btn btn-dark sm" id="clear-filter" style="margin-left:20px">
                                     <i class="fa-solid fa-filter-circle-xmark"></i>
@@ -255,6 +257,15 @@
             </div>
         </div>
     </div>
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h2>Enter Account Name</h2>
+            <input type="text" style="width:100%" id="account-name-input" placeholder="Account Name">
+            <br>
+            <button class="btn btn-dark sm" id="confirm-account-button">Download Account</button>
+        </div>
+    </div>
 
     <script type="text/javascript" src="assets/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="assets/js/tiny-slider.js"></script>
@@ -284,5 +295,7 @@
             }, 1000); 
         });
     </script>
+    <!-- Account Name Modal -->
+   
 </body>
 </html>
