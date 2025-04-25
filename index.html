@@ -51,7 +51,7 @@
                                 <i class="fa-solid fa-up-right-and-down-left-from-center top-corner" id="grow-0" style="display: none;"></i>
                                 <div class="row">
                                     <div class="col-5">                                
-                                        <p>Daily Runs: <input id="daily-0" type="number" value="1" style="width:80px"></input></p>
+                                        <p>Daily Runs: <input id="daily-0" type="number" value="1" style="width:80px"/></p>
                                     </div>
                                     <div class="col-3">  
                                         <p>Run Calls: <span id="runs-0">1</span></p>
@@ -74,7 +74,7 @@
                                     <label><input type="checkbox" name="days-0" value="sa" checked> Sat</label><br>                                          
                                 </div>  
                                 <h6 class="card-subtitle mb-2 text-muted">Run Details</h6>                                
-                                Top level actions: <input id="action-0" type="number" value="1"></input>
+                                Top level actions: <input id="action-0" type="number" value="1"/>
                                 <button type="button" class="btn btn-dark sm" id="addLoop-button-0-0"><i class="fa-solid fa-retweet"></i> Add Loop</button>
                                 <button type="button" class="btn btn-dark sm" id="addCond-button-0-0"><i class="fa-solid fa-arrow-right-arrow-left"></i> Add Condition</button>
                             </div>
@@ -117,10 +117,14 @@
             <div class="row">
                 <div class="col-lg-5 col-md-12 col-sm-12 panelAutoHeight" style="overflow:auto">
                     <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
-                        <div class="card-body" >
+                        <div class="card-body"  style="position:relative">
                             <h4 class="card-title" id="totals-title">Total Calls</h4>
                             <div  id="left-totals"></div>
-                        </div>
+                            <div class="license">
+                                <img src="assets/img/classic flow.svg" id="flow-icon" class="license-Big" style="display:none"/>
+                                <img src="assets/img/premium diamond.svg"  id="premium-icon" class="license-Big" style="display:none"/>
+                            </div>
+                            </div>
                     </div>
                     <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
                         <div class="card-body" >
@@ -128,6 +132,7 @@
                                 <Button type="button" class="btn btn-dark sm" id="import-solution" style="margin-left:20px">
                                     <i class="fas fa-file-import"></i>
                                 </Button>
+                                <button class="btn btn-dark sm" id="download-account-button">Download Account</button>
                             </h4>
                             <div  id="left-table"></div>
                         </div>
@@ -136,6 +141,7 @@
                 <div class="col-lg-7 col-md-12 col-sm-12" >
                     <div class="card">
                         <div class="card-body">
+                            
                             <h4 class="card-title" id="solutionFlowTable-title">Flows&nbsp;&nbsp;
                                 <Button type="button" class="btn btn-dark sm" id="clear-filter" style="margin-left:20px">
                                     <i class="fa-solid fa-filter-circle-xmark"></i>
@@ -251,6 +257,15 @@
             </div>
         </div>
     </div>
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h2>Enter Account Name</h2>
+            <input type="text" style="width:100%" id="account-name-input" placeholder="Account Name">
+            <br>
+            <button class="btn btn-dark sm" id="confirm-account-button">Download Account</button>
+        </div>
+    </div>
 
     <script type="text/javascript" src="assets/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="assets/js/tiny-slider.js"></script>
@@ -280,5 +295,7 @@
             }, 1000); 
         });
     </script>
+    <!-- Account Name Modal -->
+   
 </body>
 </html>

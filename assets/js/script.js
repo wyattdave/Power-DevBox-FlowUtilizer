@@ -136,7 +136,7 @@ async function unpackNestedZipFiles(file) {
             parent:"0",
             actions:aActions.filter(action =>{return action.parentId=="0" }).length,
             totalCalls:aActions.filter(action =>{return action.parentId=="0" }).length*iDaily,
-            branch:"yes",
+            branch:"y",
             flow:oFlow.id
           }];
 
@@ -168,8 +168,8 @@ async function unpackNestedZipFiles(file) {
                 iterations:iNo,
                 parent:sParentId,
                 actions:iActionsY,
-                totalCalls:Math.ceil(iActionsY*iYes),
-                branch:"yes",
+                totalCalls:Math.ceil(iActionsY*iYes)+1,
+                branch:"y",
                 flow:oFlow.id,
                 level:iLevel
               })
@@ -181,7 +181,7 @@ async function unpackNestedZipFiles(file) {
                 parent:sParentId,
                 actions:iActionsN,
                 totalCalls:Math.floor(iActionsN*iNo),
-                branch:"no",
+                branch:"n",
                 flow:oFlow.id,
                 level:iLevel
               })
@@ -197,8 +197,8 @@ async function unpackNestedZipFiles(file) {
                 iterations:iIterations,
                 parent:sParentId,
                 actions:aActions.filter(action =>{return action.parent==item.name}).length,
-                totalCalls:iIterations*aActions.filter(action =>{return action.parent==item.name && (action.branch == "Yes" || action.branch=="")}).length,
-                branch:"yes",
+                totalCalls:iIterations*aActions.filter(action =>{return action.parent==item.name && (action.branch == "y" || action.branch=="")}).length+1,
+                branch:"y",
                 flow:oFlow.id,
                 level:iLevel
               })
@@ -206,11 +206,10 @@ async function unpackNestedZipFiles(file) {
           })
 
             let iTotalAPIS=0;
-            aContainers.forEach(item =>{
-                iTotalAPIS+=(item.totalCalls*item.actions)
+            aFlowContainers.forEach(item =>{
+                iTotalAPIS+=item.totalCalls
             })    
-            const aConditions = aContainers.filter(item =>{return item.type=="condition"});
-            iTotalAPIS+=aConditions.length/2;
+
 
           aFlowCards.push({
             flowId:oFlow.id,
