@@ -19,6 +19,7 @@
   z-index: 9999;
   transition: opacity 2s ease-out; 
 }
+
 .modal {
   position: fixed;
   z-index: 1000;
@@ -29,17 +30,22 @@
   overflow: auto;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;    /* Centers vertically */
 }
 
-.modal-content {
+.modal-div {
   background-color: #fff;
   padding: 20px;
   border-radius: 5px;
   width: 300px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.modal-content {
+  border: 0px solid #fff;
 }
 
 .close {
@@ -48,16 +54,18 @@
   right: 15px;
   font-size: 20px;
   cursor: pointer;
+  z-index: 1000;
 }
 .license{
   position: absolute;
   top: 0; 
   right: 0;
+  padding: 4px;
 }
 
 .license-Big{
-  width:50px;
-  height:50px;
+  width:40px;
+  height:40px;
 }
 
 .license-Small{

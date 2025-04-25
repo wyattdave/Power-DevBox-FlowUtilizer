@@ -25,6 +25,12 @@ const eCharts=document.getElementById("charts");
 const eChartsButton=document.getElementById("chart-button");
 const eFlowLicense=document.getElementById("flow-icon");
 const ePremiumLicense=document.getElementById("premium-icon");
+const eModalClose=document.getElementById("close-modal");
+const eModal=document.getElementById("modal");
+const eAccountName=document.getElementById("account-name-input");
+const eAccountBox=document.getElementById("account-box");
+const eMessageBox=document.getElementById("message-box");
+const eMessage=document.getElementById("message-text");
 
 let aContainers=[{
     type:"action",
@@ -60,6 +66,7 @@ eSolutionTitle.addEventListener('input', (event) => {updateTable(iCurrentCard)})
 eSaveSolution.addEventListener('click',function () {saveSolution()});
 eNewSolution.addEventListener('click',function () {newSolution()});
 eChartsButton.addEventListener('click',switchChart);
+eModalClose.addEventListener('click',modalClose);
 document.getElementById("downloadYAML").addEventListener("click", downloadSolution);
 document.getElementById("title-0").addEventListener('click',function () {updateCardTitle("0")});
 document.getElementById("action-0").addEventListener('change',function () {updateActions("0","0",true)});
@@ -71,6 +78,9 @@ document.getElementById("title-0").addEventListener('input', (event) => {updateC
 document.getElementById("clear-filter").addEventListener('click',function () {updateSolutionTable("all")});
 document.getElementById("close-filter-days").addEventListener('click',closePopup);
 document.getElementById("import-solution").addEventListener('click',importSolution);
+document.getElementById("account-button").addEventListener("click", openAccount);
+document.getElementById("confirm-account-button").addEventListener("click", downloadAccount);
+document.getElementById("upload-account-button").addEventListener("click", importAccount);
 
 
 const aDaysOfWeekChecks = document.querySelectorAll("input[name='days-1']");
@@ -351,14 +361,14 @@ function updateSolutionTable(sFilter){
                 if(bDayFound){
                     document.getElementById("flow-"+flow.flowId).addEventListener('change', function () {
                         flow.on=this.checked;  
-                        updateTotals();                 
+                                   
                     });             
                     aRunningFlows.push(flow)
                 }
             })
         }
-    })    
-    updateNumbers(sCard);
+    })  
+    updateTotals();       
 }
 
 function updateTotals(){
@@ -658,7 +668,8 @@ function saveSolution(){
                 modified:getNow()
             }
         );
-        alert(eSolutionTitle.innerText+" updated")
+        openMessage(eSolutionTitle.innerText+" updated")
+       
     }else{
         aSolutions.push({
             solutionName:eSolutionTitle.innerText,
@@ -667,7 +678,8 @@ function saveSolution(){
             dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
             modified:getNow()
         });
-        alert(eSolutionTitle.innerText+" created")
+        openMessage(eSolutionTitle.innerText+" created")
+      
     }
     localStorage.setItem("solutions",JSON.stringify(aSolutions));
 }
@@ -705,6 +717,16 @@ function newSolution(){
 
 }
 
+
+// Update the downloadAccount function
+function downloadAccount() {
+    const sAccountName = eAccountName.value;
+    const sYAML=jsyaml.dump(aSolutions, { noRefs: true });
+    downloadYaml(sYAML, sAccountName + ".yaml");
+    modalClose()
+}
+
+
 function downloadSolution(){
     const oSolution= {
         solutionName:eSolutionTitle.innerText,
@@ -716,35 +738,6 @@ function downloadSolution(){
     console.log(oSolution)
     const sYAML=jsyaml.dump(oSolution,{noRefs:true});
     downloadYaml(sYAML,eSolutionTitle.innerText+".yaml")
-}
-
-
-// Close the modal
-document.getElementById("close-modal").addEventListener("click", function () {
-    document.getElementById("close-modal").style.display = "none";
-});
-
-// Confirm account name and trigger download
-document.getElementById("confirm-account-button").addEventListener("click", function () {
-    const accountName = document.getElementById("account-name-input").value.trim();
-    if (!accountName) {
-        alert("Please enter an account name.");
-        return;
-    }
-    document.getElementById("modal").style.display = "none";
-    downloadAccount(accountName);
-});
-
-// Open the account name modal when the confirm-account-name button is clicked
-document.getElementById("download-account-button").addEventListener("click", function () {
-    const accountNameModal = document.getElementById("modal");
-    accountNameModal.style.display = "flex"; // Show the modal
-});
-
-// Update the downloadAccount function
-function downloadAccount(accountName) {
-    const sYAML = jsyaml.dump(aSolutions, { noRefs: true });
-    downloadYaml(sYAML, accountName + ".yaml");
 }
 
 function downloadYaml(yamlString, filename) {
@@ -772,13 +765,39 @@ function importSolution(){
                 const existingIndex = aSolutions.findIndex(item => item.solutionId == jsonObject.solutionId);
                 if (existingIndex !== -1) {
                     aSolutions.splice(existingIndex, 1);
-                    alert("Solution with ID "+jsonObject.solutionId+" has been replaced.");
+                   
+                    openMessage("Solution with ID "+jsonObject.solutionId+" has been replaced.")
                 }
                 aSolutions.push(jsonObject);         
                 updateSolutionTable("all");
                 localStorage.setItem("solutions",JSON.stringify(aSolutions));
             } else {
-                alert('Failed to parse YAML file.');
+               
+                openMessage("Failed to parse YAML file.")
+            }
+        }
+    };
+    input.click();
+    input.remove()
+}
+
+function importAccount(){
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.yaml, .yml';
+    input.onchange = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const text = await file.text();
+            const jsonObject = jsyaml.load(text);
+            if (jsonObject) {
+                aSolutions.length=0;
+                aSolutions=jsonObject;  
+                updateSolutionTable("all");
+                localStorage.setItem("solutions",JSON.stringify(aSolutions));
+            } else {
+                
+                openMessage("Failed to parse YAML file.")
             }
         }
     };
@@ -923,4 +942,23 @@ function closePopup() {
     sDaysOfWeekFilter=selectedDays.join('|') || '';
     document.getElementById("daysPopup").style.display = "none";
     updateSolutionTable("days");
+}
+
+
+function modalClose(){
+    eModal.style.display="none";
+}
+
+function openAccount(){
+    eAccountBox.style.display="block";
+    eMessageBox.style.display="none";
+    eAccountName.value="";
+    eModal.style.display="flex";
+}
+
+function openMessage(sMessage){
+    eMessage.innerText=sMessage;
+    eAccountBox.style.display="none";
+    eMessageBox.style.display="block";
+    eModal.style.display="flex";
 }

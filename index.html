@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -12,8 +13,10 @@
     <link href="css/tiny-slider.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <title>Flow Utilizer</title>
-</head> 
+</head>
+
 <body>
+
     <body>
         <div id="splash-screen">
             <img src="assets/img/power devbox grey.png" alt="Logo" id="splash-logo">
@@ -22,280 +25,320 @@
                 <p>By Power DevBox</p>
             </div>
         </div>
-    <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Power DevBox navigation bar">
-        <div class="container">
-            <img src="assets/img/power devbox grey.png" style="height:30px"><a class="navbar-brand" href="index.html">Power DevBox<span>.</span></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarsFurni">
-                <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-                    <li><a id="switch" class="nav-link" href="#">View Solutions</a></li>
-                    <li><a id="chart-button" class="nav-link" href="#">View Charts</a></li>
-                    <li><a class="nav-link" href="https://docs.powerdevbox.com" target="_blank">Guide</a></li>
-                    <li><a class="nav-link" href="https://powerdevbox.com/contact.html" target="_blank">Contact us</a></li>
-                </ul>
-            </div>
-        </div>				
-    </nav>
-    <div id="main">
-        <br>
-        <div class="container-fluid" >
-            <div class="row">
-                <div id="left-section" class="col-lg-6 col-md-12 col-sm-12 panelAutoHeight" style="overflow:auto">
-                    <div id="card-0">
-                        <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-0-0">
-                            <div class="card-body">
-                                <h5 class="card-title" contenteditable="true" id="title-0">Flow 1</h5>
-                                <i class="fa-solid fa-down-left-and-up-right-to-center top-corner" id="shrink-0"></i>
-                                <i class="fa-solid fa-up-right-and-down-left-from-center top-corner" id="grow-0" style="display: none;"></i>
-                                <div class="row">
-                                    <div class="col-5">                                
-                                        <p>Daily Runs: <input id="daily-0" type="number" value="1" style="width:80px"/></p>
-                                    </div>
-                                    <div class="col-3">  
-                                        <p>Run Calls: <span id="runs-0">1</span></p>
-                                    </div>
-                                    <div class="col-3">  
-                                        <p> Daily Calls : <span id="apis-0">1</span></p>
-                                    </div>
-                                    <div class="col-1">  
-                                        <Button class="btn btn-dark sm" id="delete-button-card-0"><i class="fa-solid fa-trash-can"></i></Button>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="sideways">
-                                    <label><input type="checkbox" name="days-0" value="su" checked> Sun</label><br>  
-                                    <label><input type="checkbox" name="days-0" value="mo" checked> Mon</label><br>
-                                    <label><input type="checkbox" name="days-0" value="tu" checked> Tue</label><br>
-                                    <label><input type="checkbox" name="days-0" value="we" checked> Wed</label><br>
-                                    <label><input type="checkbox" name="days-0" value="th" checked> Thu</label><br>
-                                    <label><input type="checkbox" name="days-0" value="fr" checked> Fri</label><br>
-                                    <label><input type="checkbox" name="days-0" value="sa" checked> Sat</label><br>                                          
-                                </div>  
-                                <h6 class="card-subtitle mb-2 text-muted">Run Details</h6>                                
-                                Top level actions: <input id="action-0" type="number" value="1"/>
-                                <button type="button" class="btn btn-dark sm" id="addLoop-button-0-0"><i class="fa-solid fa-retweet"></i> Add Loop</button>
-                                <button type="button" class="btn btn-dark sm" id="addCond-button-0-0"><i class="fa-solid fa-arrow-right-arrow-left"></i> Add Condition</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>                
-                <div id="right-section" class="col-lg-6 col-md-12 col-sm-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="sideways">
-                                <Button type="button" class="btn btn-dark sm" id="addFlow">Add Flow</Button>
-                                <Button type="button" class="btn btn-dark sm" id="addSolution">Save Solution</Button>
-                                <Button type="button" class="btn btn-dark sm" id="newSolution">New Solution</Button>
-                                <Button type="button" class="btn btn-dark sm" id="uploadZip">Upload Solution Zip</Button>
-                                <Button type="button" class="btn btn-dark sm" id="downloadYAML">Download Solution</Button>
-                                <input type="file" id="file-input" accept="application/zip" style="display: none;"/>
-                            </div>
-                            <h4 class="card-title" contenteditable="true" id="solutionTable">Solution Name</h4>
-                            <h6 class="card-subtitle mb-2 text-muted">Flow Count: <span id="flow-count">1</span></h6>
-                            <h6 class="card-subtitle mb-2 text-muted" id="solution-daily">Total Daily Calls: 1</h6>
-                            <div id="flow-table">
-                                <table class="table">
-                                    <tr>
-                                        <th>Flow</th><th>Run Calls</th><th>Daily Calls</th><th>Actions</th><th>Daily Runs</th><th>Days</th>
-                                    </tr>
-                                    <tr>
-                                        <td>Flow 1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>su|mo|tu|we|th|fr|sa</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>  
-                    </div>
-                </div>    
-            </div>
-        </div>
-    </div>
-    <div id="solutions" style="display:none;">
-        <br>
-        <div class="container-fluid" >
-            <div class="row">
-                <div class="col-lg-5 col-md-12 col-sm-12 panelAutoHeight" style="overflow:auto">
-                    <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
-                        <div class="card-body"  style="position:relative">
-                            <h4 class="card-title" id="totals-title">Total Calls</h4>
-                            <div  id="left-totals"></div>
-                            <div class="license">
-                                <img src="assets/img/classic flow.svg" id="flow-icon" class="license-Big" style="display:none"/>
-                                <img src="assets/img/premium diamond.svg"  id="premium-icon" class="license-Big" style="display:none"/>
-                            </div>
-                            </div>
-                    </div>
-                    <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
-                        <div class="card-body" >
-                            <h4 class="card-title" id="solutionTable-title">Solutions&nbsp;&nbsp;
-                                <Button type="button" class="btn btn-dark sm" id="import-solution" style="margin-left:20px">
-                                    <i class="fas fa-file-import"></i>
-                                </Button>
-                                <button class="btn btn-dark sm" id="download-account-button">Download Account</button>
-                            </h4>
-                            <div  id="left-table"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-7 col-md-12 col-sm-12" >
-                    <div class="card">
-                        <div class="card-body">
-                            
-                            <h4 class="card-title" id="solutionFlowTable-title">Flows&nbsp;&nbsp;
-                                <Button type="button" class="btn btn-dark sm" id="clear-filter" style="margin-left:20px">
-                                    <i class="fa-solid fa-filter-circle-xmark"></i>
-                                </Button>
-                                <Button type="button" class="btn btn-dark sm" id="days-filter" style="margin-left:20px" onclick="openPopup(this)">
-                                    <i class="fas fa-calendar-day"></i>
-                                </Button>
-                            </h4>
-                            <div id="right-table" ></div>
-                        </div>  
-                    </div>
-                </div>
-                <div class="popup" id="daysPopup">
-                    <h2>Select Days</h2>
-                    <ul>
-                    <li>
-                        <label>
-                            <input type="checkbox" name="days-filter" value="su" checked/>
-                            Sunday
-                        </label>
-                        </li>
-                     <li>
-                      <label>
-                       <input type="checkbox" name="days-filter" value="mo" checked/>
-                       Monday
-                      </label>
-                     </li>
-                     <li>
-                      <label>
-                       <input type="checkbox" name="days-filter" value="tu" checked/>
-                       Tuesday
-                      </label>
-                     </li>
-                     <li>
-                      <label>
-                       <input type="checkbox" name="days-filter" value="we" checked/>
-                       Wednesday
-                      </label>
-                     </li>
-                     <li>
-                      <label>
-                       <input type="checkbox" name="days-filter" value="th" checked/>
-                       Thursday
-                      </label>
-                     </li>
-                     <li>
-                      <label>
-                       <input type="checkbox" name="days-filter" value="fr" checked/>
-                       Friday
-                      </label>
-                     </li>
-                     <li>
-                      <label>
-                       <input type="checkbox" name="days-filter" value="sa" checked/>
-                       Saturday
-                      </label>
-                     </li>                     
-                    </ul>
-                    <button class="btn btn-dark sm" id="close-filter-days">Filter</button>
-                   </div>    
-            </div>
-        </div>
-    </div>
-    <div id="charts" style="display:none">
-        <div class="container-fluid" >
-            <div class="row">
-                <div class="col-lg-6 col-md-8 col-sm-12 chartRow">
-                    <div class="card " >
-                        <div class="card-body" >
-                            <canvas id="timelineChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6 chartRow" >
-                    <div class="card ">
-                        <div class="card-body" >
-                            <canvas id="daysMixChart" ></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-3 col-md-4 col-sm-6 chartRow">
-                    <div class="card ">
-                        <div class="card-body" >
-                            <canvas id="flowsChart" ></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-8 col-sm-12 chartRow">
-                    <div class="card" >
-                        <div class="card-body" >
-                            <canvas id="flowChart" ></canvas>
-                        </div>
-                    </div>
-                </div>    
-            </div>
-        </div>
-    </div>
-    <div class="container relative">
-        <div class="border-top copyright">
-            <div class="row pt-4">
-                <div class="col-lg-6">
-                    <p class="mb-2 text-center text-lg-start">Copyright &copy;<script>document.write(new Date().getFullYear());</script>. All Rights Reserved. </p>
-                </div>
-                <div class="col-lg-6 text-center text-lg-end">
-                    <ul class="list-unstyled d-inline-flex ms-auto">
-                        <li class="me-4">WyattDave</li>
-                        <li class="me-4">WyattDaveDev</li>
-                        <li class="me-4">LowCodeDev</li>
+        <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
+            arial-label="Power DevBox navigation bar">
+            <div class="container">
+                <img src="assets/img/power devbox grey.png" style="height:30px"><a class="navbar-brand"
+                    href="index.html">Power DevBox<span>.</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni"
+                    aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarsFurni">
+                    <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                        <li><a id="switch" class="nav-link" href="#">View Solutions</a></li>
+                        <li><a id="chart-button" class="nav-link" href="#">View Charts</a></li>
+                        <li><a id="account-button" class="nav-link" href="#">Account</a></li>
+                        <li><a class="nav-link" href="https://docs.powerdevbox.com" target="_blank">Guide</a></li>
+                        <li><a class="nav-link" href="https://powerdevbox.com/contact.html" target="_blank">Contact
+                                us</a></li>
                     </ul>
                 </div>
             </div>
-        </div>
-    </div>
-    <div id="modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close" id="close-modal">&times;</span>
-            <h2>Enter Account Name</h2>
-            <input type="text" style="width:100%" id="account-name-input" placeholder="Account Name">
+        </nav>
+        <div id="main">
             <br>
-            <button class="btn btn-dark sm" id="confirm-account-button">Download Account</button>
+            <div class="container-fluid">
+                <div class="row">
+                    <div id="left-section" class="col-lg-6 col-md-12 col-sm-12 panelAutoHeight" style="overflow:auto">
+                        <div id="card-0">
+                            <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-0-0">
+                                <div class="card-body">
+                                    <h5 class="card-title" contenteditable="true" id="title-0">Flow 1</h5>
+                                    <i class="fa-solid fa-down-left-and-up-right-to-center top-corner"
+                                        id="shrink-0"></i>
+                                    <i class="fa-solid fa-up-right-and-down-left-from-center top-corner" id="grow-0"
+                                        style="display: none;"></i>
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <p>Daily Runs: <input id="daily-0" type="number" value="1"
+                                                    style="width:80px" /></p>
+                                        </div>
+                                        <div class="col-3">
+                                            <p>Run Calls: <span id="runs-0">1</span></p>
+                                        </div>
+                                        <div class="col-3">
+                                            <p> Daily Calls : <span id="apis-0">1</span></p>
+                                        </div>
+                                        <div class="col-1">
+                                            <Button class="btn btn-dark sm" id="delete-button-card-0"><i
+                                                    class="fa-solid fa-trash-can"></i></Button>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="sideways">
+                                        <label><input type="checkbox" name="days-0" value="su" checked> Sun</label><br>
+                                        <label><input type="checkbox" name="days-0" value="mo" checked> Mon</label><br>
+                                        <label><input type="checkbox" name="days-0" value="tu" checked> Tue</label><br>
+                                        <label><input type="checkbox" name="days-0" value="we" checked> Wed</label><br>
+                                        <label><input type="checkbox" name="days-0" value="th" checked> Thu</label><br>
+                                        <label><input type="checkbox" name="days-0" value="fr" checked> Fri</label><br>
+                                        <label><input type="checkbox" name="days-0" value="sa" checked> Sat</label><br>
+                                    </div>
+                                    <h6 class="card-subtitle mb-2 text-muted">Run Details</h6>
+                                    Top level actions: <input id="action-0" type="number" value="1" />
+                                    <button type="button" class="btn btn-dark sm" id="addLoop-button-0-0"><i
+                                            class="fa-solid fa-retweet"></i> Add Loop</button>
+                                    <button type="button" class="btn btn-dark sm" id="addCond-button-0-0"><i
+                                            class="fa-solid fa-arrow-right-arrow-left"></i> Add Condition</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="right-section" class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="sideways">
+                                    <Button type="button" class="btn btn-dark sm" id="addFlow">Add Flow</Button>
+                                    <Button type="button" class="btn btn-dark sm" id="addSolution">Save
+                                        Solution</Button>
+                                    <Button type="button" class="btn btn-dark sm" id="newSolution">New Solution</Button>
+                                    <Button type="button" class="btn btn-dark sm" id="uploadZip">Upload Solution
+                                        Zip</Button>
+                                    <Button type="button" class="btn btn-dark sm" id="downloadYAML">Download
+                                        Solution</Button>
+                                    <input type="file" id="file-input" accept="application/zip"
+                                        style="display: none;" />
+                                </div>
+                                <h4 class="card-title" contenteditable="true" id="solutionTable">Solution Name</h4>
+                                <h6 class="card-subtitle mb-2 text-muted">Flow Count: <span id="flow-count">1</span>
+                                </h6>
+                                <h6 class="card-subtitle mb-2 text-muted" id="solution-daily">Total Daily Calls: 1</h6>
+                                <div id="flow-table">
+                                    <table class="table">
+                                        <tr>
+                                            <th>Flow</th>
+                                            <th>Run Calls</th>
+                                            <th>Daily Calls</th>
+                                            <th>Actions</th>
+                                            <th>Daily Runs</th>
+                                            <th>Days</th>
+                                        </tr>
+                                        <tr>
+                                            <td>Flow 1</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>su|mo|tu|we|th|fr|sa</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+        <div id="solutions" style="display:none;">
+            <br>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-5 col-md-12 col-sm-12 panelAutoHeight" style="overflow:auto">
+                        <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
+                            <div class="card-body" style="position:relative">
+                                <h4 class="card-title" id="totals-title">Total Calls</h4>
+                                <div id="left-totals"></div>
+                                <div class="license">
+                                    <img src="assets/img/classic flow.svg" id="flow-icon" class="license-Big"
+                                        style="display:none" />
+                                    <img src="assets/img/premium diamond.svg" id="premium-icon" class="license-Big"
+                                        style="display:none" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-1-0">
+                            <div class="card-body">
+                                <h4 class="card-title" id="solutionTable-title">Solutions&nbsp;&nbsp;
+                                    <Button type="button" class="btn btn-dark sm" id="import-solution"
+                                        style="margin-left:20px">
+                                        <i class="fas fa-file-import"></i>
+                                    </Button>
+                                </h4>
+                                <div id="left-table"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-12 col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
 
-    <script type="text/javascript" src="assets/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript" src="assets/js/tiny-slider.js"></script>
-    <script type="text/javascript" src="assets/js/custom.js"></script>
-    
-    <script type="text/javascript" src="assets/js/calc.js"></script>
-    <script type="text/javascript" src="assets/js/connectors.js"></script>
-    <script type="text/javascript" src="assets/js/zip.min.js"></script>
-    <script type="text/javascript" src="assets/js/config.js"></script>
-    <script type="text/javascript" src="assets/js/xmlToJson.js"></script>
-    <script type="text/javascript" src="assets/js/data generator.js"></script>
-    <script type="text/javascript" src="assets/js/script.js"></script>
-    <script type="text/javascript" src="assets/js/chart.umd.js"></script>
-    <script type="text/javascript" src="assets/js/data.js"></script>
+                                <h4 class="card-title" id="solutionFlowTable-title">Flows&nbsp;&nbsp;
+                                    <Button type="button" class="btn btn-dark sm" id="clear-filter"
+                                        style="margin-left:20px">
+                                        <i class="fa-solid fa-filter-circle-xmark"></i>
+                                    </Button>
+                                    <Button type="button" class="btn btn-dark sm" id="days-filter"
+                                        style="margin-left:20px" onclick="openPopup(this)">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </Button>
+                                </h4>
+                                <div id="right-table"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="popup" id="daysPopup">
+                        <h2>Select Days</h2>
+                        <ul>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="days-filter" value="su" checked />
+                                    Sunday
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="days-filter" value="mo" checked />
+                                    Monday
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="days-filter" value="tu" checked />
+                                    Tuesday
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="days-filter" value="we" checked />
+                                    Wednesday
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="days-filter" value="th" checked />
+                                    Thursday
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="days-filter" value="fr" checked />
+                                    Friday
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="days-filter" value="sa" checked />
+                                    Saturday
+                                </label>
+                            </li>
+                        </ul>
+                        <button class="btn btn-dark sm" id="close-filter-days">Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="charts" style="display:none">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-6 col-md-8 col-sm-12 chartRow">
+                        <div class="card ">
+                            <div class="card-body">
+                                <canvas id="timelineChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6 chartRow">
+                        <div class="card ">
+                            <div class="card-body">
+                                <canvas id="daysMixChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-4 col-sm-6 chartRow">
+                        <div class="card ">
+                            <div class="card-body">
+                                <canvas id="flowsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-8 col-sm-12 chartRow">
+                        <div class="card">
+                            <div class="card-body">
+                                <canvas id="flowChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container relative">
+            <div class="border-top copyright">
+                <div class="row pt-4">
+                    <div class="col-lg-6">
+                        <p class="mb-2 text-center text-lg-start">Copyright &copy;
+                            <script>document.write(new Date().getFullYear());</script>. All Rights Reserved.
+                        </p>
+                    </div>
+                    <div class="col-lg-6 text-center text-lg-end">
+                        <ul class="list-unstyled d-inline-flex ms-auto">
+                            <li class="me-4">WyattDave</li>
+                            <li class="me-4">WyattDaveDev</li>
+                            <li class="me-4">LowCodeDev</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="modal" class="modal" style="display: none;">
+            <div class="modal-div">
+                <span class="close" id="close-modal">&times;</span>
+                <div id="account-box" class="modal-content">
+                    <h2>Export Account</h2>
+                    <input type="text" style="width:100%; margin-bottom: 5px;" id="account-name-input"
+                        placeholder="Enter Account Name">
+                    <button class="btn btn-dark sm" style="width:100%;" id="confirm-account-button">Download Account</button>
+                    <hr>
+                    <h2>Import Account</h2>
+                    <button class="btn btn-dark sm" style="width:100%;" id="upload-account-button">Import Account</button>
+                </div>
+                <div id="message-box" class="modal-content" style="display: none;">
+                    <p id="message-text">This is a message.</p>
+                </div>
+            </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script>
-         if('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service worker.js', { scope: '/' });
-        }
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.body.classList.add('loaded');
-                setTimeout(function() {
-                    document.getElementById('splash-screen').style.display = 'none';
-                }, 2000);
-            }, 1000); 
-        });
-    </script>
-    <!-- Account Name Modal -->
-   
-</body>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+        <script type="text/javascript" src="assets/js/bootstrap.bundle.min.js"></script>
+        <script type="text/javascript" src="assets/js/tiny-slider.js"></script>
+        <script type="text/javascript" src="assets/js/custom.js"></script>
+
+        <script type="text/javascript" src="assets/js/calc.js"></script>
+        <script type="text/javascript" src="assets/js/connectors.js"></script>
+        <script type="text/javascript" src="assets/js/zip.min.js"></script>
+        <script type="text/javascript" src="assets/js/config.js"></script>
+        <script type="text/javascript" src="assets/js/xmlToJson.js"></script>
+        <script type="text/javascript" src="assets/js/data generator.js"></script>
+        <script type="text/javascript" src="assets/js/script.js"></script>
+        <script type="text/javascript" src="assets/js/chart.umd.js"></script>
+        <script type="text/javascript" src="assets/js/data.js"></script>
+
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service worker.js', { scope: '/' });
+            }
+            window.addEventListener('load', function () {
+                setTimeout(function () {
+                    document.body.classList.add('loaded');
+                    setTimeout(function () {
+                        document.getElementById('splash-screen').style.display = 'none';
+                    }, 2000);
+                }, 1000);
+            });
+        </script>
+    </body>
+
 </html>
