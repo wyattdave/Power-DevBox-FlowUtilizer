@@ -1,4 +1,4 @@
-const CACHE_NAME = `calc v0.0.0.0`;
+const CACHE_NAME = `flow v0.0.0.0`;
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {

@@ -1,20 +1,20 @@
 {
   "lang": "en-us",
-  "name": "Power DevBox Flow Calculate",
-  "short_name": "AutoReview",
-  "description": "Calculate Power Platform API calls in your flow",
+  "name": "Power DevBox Flow Utilizer",
+  "short_name": "Flow Utilizer",
+  "description": "Calculate Power Platform API calls in your flows",
   "start_url": "/",
-  "background_color": "#044288",
+  "background_color": "#3B3B3B",
   "theme_color": "#ffffff",
   "orientation": "any",
   "display": "standalone",
   "icons": [
     {
-      "src": "/assets/img/power devbox black 128.png",
+      "src": "/assets/img/flow Utilizer 128.png",
       "sizes": "128x128"
     }
   ],
-  "id": "powerdevbox_calculate",
+  "id": "powerdevbox_flow_utilizer",
   "display_override": [
     "window-controls-overlay",
     "standalone",
@@ -26,31 +26,31 @@
   ],
   "screenshots": [
     {
-      "src": "assets/img/autoreview webapp.PNG",
+      "src": "assets/img/screen1.png",
       "sizes": "1280x800",
       "type": "image/png",
       "platform": "wide"
     },
     {
-      "src": "assets/img/autoreview (1).PNG",
+      "src": "assets/img/screen2.png",
       "sizes": "1280x800",
       "type": "image/png",
       "platform": "wide"
     },
     {
-      "src": "assets/img/autoreview (2).PNG",
+      "src": "assets/img/screen3.png",
       "sizes": "1280x800",
       "type": "image/png",
       "platform": "wide"
     },
     {
-      "src": "assets/img/autoreview (3).PNG",
+      "src": "assets/img/screen4.png",
       "sizes": "1280x800",
       "type": "image/png",
       "platform": "wide"
     }
   ],
-  "scope": "calculate.powerdevbox.com",
+  "scope": "flow.powerdevbox.com",
   "dir": "ltr",
   "prefer_related_applications": false,
   "edge_side_panel": {

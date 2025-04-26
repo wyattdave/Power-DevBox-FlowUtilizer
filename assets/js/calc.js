@@ -802,7 +802,9 @@ function importAccount(){
         }
     };
     input.click();
-    input.remove()
+    input.remove();
+    modalClose();
+    switchMode();
 }
 
 function shrinkCard(id) {   

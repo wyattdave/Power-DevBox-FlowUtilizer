@@ -11,7 +11,7 @@
   position: fixed;
   width: 100%;
   height: 100%;
-  background-color: #2f2f2f;
+  background-color: #3B3B3B;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -115,10 +115,10 @@ a {
   -webkit-transition: .3s all ease;
   -o-transition: .3s all ease;
   transition: .3s all ease;
-  color: #2f2f2f;
+  color: #3B3B3B;
   text-decoration: underline; }
   a:hover {
-    color: #2f2f2f;
+    color: #3B3B3B;
     text-decoration: none; }
   a.more {
     font-weight: 600; }
@@ -260,12 +260,12 @@ a {
   padding: 12px 30px;
   border-radius: 30px;
   color: #ffffff;
-  background: #2f2f2f;
-  border-color: #2f2f2f; }
+  background: #3B3B3B;
+  border-color: #3B3B3B; }
   .btn:hover {
     color: #ffffff;
     background: #6a6a6a;
-    border-color: #2f2f2f; }
+    border-color: #3B3B3B; }
   .btn:active, .btn:focus {
     outline: none !important;
     -webkit-box-shadow: none;
@@ -279,11 +279,11 @@ a {
   .btn.btn-secondary {
     color: #ffffff;
     background: #044288;
-    border-color: #2f2f2f; 
+    border-color: #3B3B3B; 
     margin-bottom: 1rem; }
     .btn.btn-secondary:hover {
       background: #04428889;
-      border-color: #2f2f2f; 
+      border-color: #3B3B3B; 
       margin-bottom: 1rem; }
   .btn.btn-white-outline {
     background: transparent;
@@ -298,37 +298,37 @@ a {
   .btn.btn-powerapp {
       background: #952F8D;
       color: #ffffff;
-      border-color:#2f2f2f; 
+      border-color:#3B3B3B; 
       margin-bottom: 1rem;}
     .btn.btn-powerapp:hover {
-        border-color: #2f2f2f;
+        border-color: #3B3B3B;
         color: #952f8c82;
         margin-bottom: 1rem; }
   .btn.btn-shortcut {
       background: #48A432;
       color: #ffffff;
-      border-color:#2f2f2f;
+      border-color:#3B3B3B;
       margin-bottom: 1rem; }
   .btn.btn-shortcut:hover {
-        border-color: #2f2f2f;
+        border-color: #3B3B3B;
         color: #49a43278;
         margin-bottom: 1rem; }
   .btn.btn-share {
       background: #3688F3;
       color: #ffffff;
-      border-color:#2f2f2f; 
+      border-color:#3B3B3B; 
       margin-bottom: 1rem;}
   .btn.btn-share:hover {
-        border-color: #2f2f2f;
+        border-color: #3B3B3B;
         color: #3688f37a; 
         margin-bottom: 1rem;}
   .btn.btn-exception {
       background: #84223B;
       color: #ffffff;
-      border-color:#2f2f2f; 
+      border-color:#3B3B3B; 
       margin-bottom: 1rem;}
     .btn.btn-exception:hover {
-        border-color: #2f2f2f;
+        border-color: #3B3B3B;
         color: #84223b8a; 
         margin-bottom: 1rem;}
 
@@ -341,7 +341,7 @@ a {
 
 
 .section-title {
-  color: #2f2f2f; }
+  color: #3B3B3B; }
 
 .product-section {
   padding: 7rem 0; }
@@ -366,14 +366,14 @@ a {
       font-weight: 800 !important;
       font-size: 18px !important; }
     .product-section .product-item h3, .product-section .product-item strong {
-      color: #2f2f2f;
+      color: #3B3B3B;
       text-decoration: none; }
     .product-section .product-item .icon-cross {
       position: absolute;
       width: 35px;
       height: 35px;
       display: inline-block;
-      background: #2f2f2f;
+      background: #3B3B3B;
       bottom: 15px;
       left: 50%;
       -webkit-transform: translateX(-50%);
@@ -451,7 +451,7 @@ a {
       bottom: 0; }
   .feature h3 {
     font-size: 14px;
-    color: #2f2f2f; }
+    color: #3B3B3B; }
   .feature p {
     font-size: 14px;
     line-height: 22px;
@@ -530,10 +530,10 @@ a {
   .popular-product .product-item-sm h3 {
     font-size: 14px;
     font-weight: 700;
-    color: #2f2f2f; }
+    color: #3B3B3B; }
   .popular-product .product-item-sm a {
     text-decoration: none;
-    color: #2f2f2f;
+    color: #3B3B3B;
     -webkit-transition: .3s all ease;
     -o-transition: .3s all ease;
     transition: .3s all ease; }
@@ -584,7 +584,7 @@ a {
   .testimonial-slider-wrap .item .testimonial-block .author-info h3 {
     font-size: 14px;
     font-weight: 700;
-    color: #2f2f2f;
+    color: #3B3B3B;
     margin-bottom: 0; }
   .testimonial-slider-wrap #testimonial-nav {
     position: absolute;
@@ -603,7 +603,7 @@ a {
       line-height: 58px;
       border-radius: 50%;
       background: rgba(59, 93, 80, 0.1);
-      color: #2f2f2f;
+      color: #3B3B3B;
       -webkit-transition: .3s all ease;
       -o-transition: .3s all ease;
       transition: .3s all ease; }
@@ -687,7 +687,7 @@ a {
     position: relative; }
   .footer-section a {
     text-decoration: none;
-    color: #2f2f2f;
+    color: #3B3B3B;
     -webkit-transition: .3s all ease;
     -o-transition: .3s all ease;
     transition: .3s all ease; }
