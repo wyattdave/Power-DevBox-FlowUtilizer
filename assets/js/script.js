@@ -149,7 +149,7 @@ async function unpackNestedZipFiles(file) {
             const sParentId=item.parentId.replace("MISSING",oFlow.id)
             if(convertContainer(item.type)=="condition"){
               if(item.notes.includes("Ratio:")){
-                const sRatio=oFlow.triggerNote.split("Iterations:")[1].split("|")[0];
+                const sRatio=oFlow.triggerNote.split("Ratio:")[1].split("|")[0];
                 if (sRatio.includes("/")){
                   iYes=parseInt(sRatio.split("/")[0].trim());
                   iNo=parseInt(sRatio.split("/")[1].trim());
@@ -214,8 +214,8 @@ async function unpackNestedZipFiles(file) {
           aFlowCards.push({
             flowId:oFlow.id,
             name:oFlow.name,
-            dailyCalls:iDaily*iTotalAPIS,
-            runCalls:iTotalAPIS,
+            dailyCalls:(iDaily*iTotalAPIS).toFixed(),
+            runCalls:iTotalAPIS.toFixed(),
             actions:aActions.filter(action =>{return action.parent=="root"}).length,
             dailyRuns:iDaily,
             solution:oDependencies.ImportExportXml.SolutionManifest.UniqueName,

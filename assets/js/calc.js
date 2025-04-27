@@ -124,7 +124,7 @@ function addCard(oFlow,oContainer){
             level:0
         }
     }   
-    document.getElementById("flow-count").innerText=aCards.length;
+    
     const eNewCard=eTemplate.cloneNode(true);
 
     eleftSection.appendChild(eNewCard);
@@ -167,6 +167,7 @@ function addCard(oFlow,oContainer){
     aContainers.push(oContainer);
     oFlow.containers=JSON.parse(JSON.stringify(aContainers.filter(item => item.flow==oFlow.flowId)));
     aCards.push(oFlow);
+    document.getElementById("flow-count").innerText=aCards.length;
     updateTable(oFlow.flowId);
 }
 
@@ -549,8 +550,8 @@ function updateCard(sCard){
         }
     )
     
-    document.getElementById("apis-"+sCard).innerText=iTotalActions*iDaily;  
-    document.getElementById("runs-"+sCard).innerText=iTotalActions;  
+    document.getElementById("apis-"+sCard).innerText=(iTotalActions*iDaily).toFixed();  
+    document.getElementById("runs-"+sCard).innerText=iTotalActions.toFixed();  
     updateTable(sCard);
 }
 
@@ -565,16 +566,16 @@ function updateTable(sCard){
         })    
         Object.assign(updateItem,
             {
-                dailyCalls:Number(document.getElementById("apis-"+sCard).innerText),
-                runCalls:Number(document.getElementById("runs-"+sCard).innerText),
+                dailyCalls:Math.ceil(Number(document.getElementById("apis-"+sCard).innerText)).toFixed(),
+                runCalls:Math.ceil(Number(document.getElementById("runs-"+sCard).innerText)).toFixed(),
                 actions:iTotalActions,
-                dailyRuns:Number(document.getElementById("daily-"+sCard).value),
+                dailyRuns:Math.ceil(Number(document.getElementById("daily-"+sCard).value)).toFixed(),
                 solution:eSolutionTitle.innerText,
                 daysOfWeek:sDaysOfWeek
             }
         )
     }
-    let sHTML="<table class='table'><tr><th>Flow</th><th>Run API's</th><th>Daily API's</th><th>Actions</th><th>Daily Runs</th><th>Days</th></tr>";
+    let sHTML="<table class='table'><tr><th>Flow</th><th>Run Calls</th><th>Dail Calls</th><th>Actions</th><th>Daily Runs</th><th>Days</th></tr>";
     aCards.forEach(item =>{
         const sRow="<tr><td>"+
         item.name+"</td><td>"+
@@ -587,7 +588,7 @@ function updateTable(sCard){
     })
     sHTML+="</table>"
     eFlowTable.innerHTML=sHTML;
-    eSolutionDaily.innerText="Total Daily API: "+aCards.reduce((sum, item) => sum + item.dailyCalls, 0);    
+    eSolutionDaily.innerText="Total Daily Calls: "+Number(aCards.reduce((sum, item) => sum + item.dailyCalls, 0));    
 }
 
 function getTotalCalls(id,sCard,iTotalCalls) {
@@ -598,7 +599,7 @@ function getTotalCalls(id,sCard,iTotalCalls) {
     aChildren.forEach(item =>{
         iTotalCalls+=item.totalCalls;
     })
-    return iTotalCalls
+    return iTotalCalls.toFixed()
 }
 
 function loadSolution(id){
