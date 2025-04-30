@@ -36,8 +36,8 @@ function loadCharts(bRefresh){
         item.flows.forEach(flow => {
             aDaysOfWeekList.forEach((day, index) => {
                 if(flow.daysOfWeek.includes(day)){
-                    aDayCount[index]+=flow.dailyCalls;
-                    aDayCountAll[index]+=flow.dailyCalls;
+                    aDayCount[index]+=Number(flow.dailyCalls);
+                    aDayCountAll[index]+=Number(flow.dailyCalls);
                 }
             })
         })
@@ -113,20 +113,21 @@ function loadCharts(bRefresh){
         label: "Total Daily Calls",
         data: aDayCountAll,
         backgroundColor: [
-            "rgb(66, 135, 246)",
-            "rgb(216, 46, 46)",
-            "rgb(226, 226, 56)",
-            "rgb(46, 196, 56)",
-            "rgb(176, 56, 196)",
-            "rgb(236, 136, 56)",
-            "rgb(56, 179, 236)"
+            "rgb(66, 135, 246)"
         ],
         hoverOffset: 4
         }]
     };
-
+/*,
+"rgb(216, 46, 46)",
+"rgb(226, 226, 56)",
+"rgb(46, 196, 56)",
+"rgb(176, 56, 196)",
+"rgb(236, 136, 56)",
+"rgb(56, 179, 236)"
+*/
     config = {
-        type: "doughnut",
+        type: "radar",
         data: data,
         options: {
             responsive: true,

@@ -301,7 +301,7 @@ function updateSolutionTable(sFilter){
         let sRow="<tr><td id='solution-"+sol.solutionId+"'>"+
         sol.solutionName+"</td><td>"+
         sol.flows.length+"</td><td>"+
-        sol.dailyCalls+"</td><td>"+
+        Number(sol.dailyCalls)+"</td><td>"+
         sol.modified+"</td><td>"+
         "<Button class='btn btn-dark sm' id='delete-solution-"+sol.solutionId+"' style='margin-right:5px;'><i class='fa-solid fa-trash-can'></i></Button>"+
         "<Button class='btn btn-dark sm' id='filter-solution-"+sol.solutionId+"'><i class='fa-solid fa-filter'></i></Button>";
