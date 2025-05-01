@@ -297,7 +297,7 @@ function updateSolutionTable(sFilter){
     let sTableSolutions="<table class='table'><tr><th>Solution</th><th>Flows</th><th>Daily Calls</th><th>Modified</th><th></th></tr>";
     let sTableFlows="<table class='table'><tr><th>Solution</th><th>Flow</th><th>Run Calls</th><th>Daily Calls</th><th>Days Of Week</th><th>Include</th></tr>";
     aSolutions.forEach(sol =>{    
-        sol.dailyCalls=sol.flows.reduce((sum, item) => sum + item.dailyCalls, 0);
+        sol.dailyCalls=sol.flows.reduce((sum, item) => sum + Number(item.dailyCalls), 0);
         let sRow="<tr><td id='solution-"+sol.solutionId+"'>"+
         sol.solutionName+"</td><td>"+
         sol.flows.length+"</td><td>"+
@@ -374,7 +374,7 @@ function updateSolutionTable(sFilter){
 
 function updateTotals(){
     const aFilteredFlows=aRunningFlows.filter(item => item.on);
-    const iTotalCalls=aFilteredFlows.reduce((sum, item) => sum + item.dailyCalls, 0);
+    const iTotalCalls=aFilteredFlows.reduce((sum, item) => sum + Number(item.dailyCalls), 0);
     let sHTML="<p>Total Daily Runs:"+iTotalCalls+
     "</p><p>Running Flows:"+aFilteredFlows.length+"</p>"
     document.getElementById("left-totals").innerHTML=sHTML;
@@ -588,7 +588,7 @@ function updateTable(sCard){
     })
     sHTML+="</table>"
     eFlowTable.innerHTML=sHTML;
-    eSolutionDaily.innerText="Total Daily Calls: "+Number(aCards.reduce((sum, item) => sum + item.dailyCalls, 0));    
+    eSolutionDaily.innerText="Total Daily Calls: "+Number(aCards.reduce((sum, item) => sum + Number(item.dailyCalls), 0));    
 }
 
 function getTotalCalls(id,sCard,iTotalCalls) {
@@ -665,7 +665,7 @@ function saveSolution(){
                 solutionName:eSolutionTitle.innerText,
                 solutionId:sSolution,
                 flows:JSON.parse(JSON.stringify(aCards)),
-                dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
+                dailyCalls:aCards.reduce((sum, item) => sum + Number(item.dailyCalls), 0),
                 modified:getNow()
             }
         );
@@ -676,7 +676,7 @@ function saveSolution(){
             solutionName:eSolutionTitle.innerText,
             solutionId:sSolution,
             flows:JSON.parse(JSON.stringify(aCards)),
-            dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
+            dailyCalls:aCards.reduce((sum, item) => sum + Number(item.dailyCalls), 0),
             modified:getNow()
         });
         openMessage(eSolutionTitle.innerText+" created")
@@ -733,7 +733,7 @@ function downloadSolution(){
         solutionName:eSolutionTitle.innerText,
         solutionId:sSolution,
         flows:JSON.parse(JSON.stringify(aCards)),
-        dailyCalls:aCards.reduce((sum, item) => sum + item.dailyCalls, 0),
+        dailyCalls:aCards.reduce((sum, item) => sum + Number(item.dailyCalls), 0),
         modified:getNow()
     }
     console.log(oSolution)
