@@ -10,11 +10,18 @@
 .hide-on-mobile {
   display: none;
 }
+.fullButton{
+  display: none;
+}
 
-@media (min-width: 768px) {
-  .hide-on-mobile {
-      display: block;
+@media (min-width: 500px) {
+  .hide-on-mobile{
+    display:  table-cell;
   }
+  .fullButton{
+    display: inline!important;
+  }
+
 }
 
 

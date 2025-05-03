@@ -363,9 +363,10 @@ function updateSolutionTable(sFilter){
                 })
                 if(bDayFound){
                     document.getElementById("flow-"+flow.flowId).addEventListener('change', function () {
-                        flow.on=this.checked;                                     
+                        flow.on=this.checked;  
+                        updateTotals();                                     
                     });             
-                    aRunningFlows.push(flow)
+                    aRunningFlows.push(flow);
                 }
             })
         }
