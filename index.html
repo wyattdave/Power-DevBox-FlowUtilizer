@@ -37,8 +37,10 @@
                         <li><a id="switch" class="nav-link" href="#">View Solutions</a></li>
                         <li><a id="chart-button" class="nav-link" href="#">View Charts</a></li>
                         <li><a id="account-button" class="nav-link" href="#">Account</a></li>
-                        <li><a class="nav-link" href="https://docs.powerdevbox.com" target="_blank">Guide</a></li>
+                        <li><a class="nav-link" href="https://docs.powerdevbox.com/flow-utilizer" target="_blank">Docs</a></li>
                         <li><a class="nav-link" href="https://powerdevbox.com/contact.html" target="_blank"><img src="assets/img/power devbox grey.png" style="height: 15px;"/> Contact us</a></li>
+                        <li><a class="nav-link" href="https://powerdevbox.com" target="_blank"><img src="assets/img/power devbox grey.png" style="height: 15px;"/> More Dev Tools</a></li>
+                        <li><a class="nav-link" href="https://buymeacoffee.com/wyattdave" target="_blank"><i class="fa fa-coffee" aria-hidden="true"></i></a></li>
                     </ul>
                 </div>
             </div>
@@ -52,22 +54,20 @@
                             <div class="card" style="height:auto; margin-bottom: 20px;" id="actions-div-0-0">
                                 <div class="card-body">
                                     <h5 class="card-title" contenteditable="true" id="title-0">Flow 1</h5>
-                                    <i class="fa-solid fa-down-left-and-up-right-to-center top-corner"
-                                        id="shrink-0"></i>
-                                    <i class="fa-solid fa-up-right-and-down-left-from-center top-corner" id="grow-0"
-                                        style="display: none;"></i>
+                                    <i class="fa-solid fa-down-left-and-up-right-to-center top-corner" id="shrink-0"></i>
+                                    <i class="fa-solid fa-up-right-and-down-left-from-center top-corner" id="grow-0" style="display: none;"></i>
                                     <div class="row">
-                                        <div class="col-5">
+                                        <div class="col-lg-5 col-md-5 col-3">
                                             <p>Daily Runs: <input id="daily-0" type="number" value="1"
-                                                    style="width:80px" /></p>
+                                                    style="width:90%" /></p>
                                         </div>
-                                        <div class="col-3">
+                                        <div class="col-lg-3 col-md-3 col-3">
                                             <p>Run Calls: <span id="runs-0">1</span></p>
                                         </div>
-                                        <div class="col-3">
+                                        <div class="ccol-lg-3 col-md-3 col-3">
                                             <p> Daily Calls : <span id="apis-0">1</span></p>
                                         </div>
-                                        <div class="col-1">
+                                        <div class="col-lg-1 col-md-1 col-2">
                                             <Button class="btn btn-dark sm" id="delete-button-card-0"><i
                                                     class="fa-solid fa-trash-can"></i></Button>
                                         </div>
@@ -86,9 +86,9 @@
                                     <h6 class="card-subtitle mb-2 text-muted">Run Details</h6>
                                     Top level actions: <input id="action-0" type="number" value="1" />
                                     <button type="button" class="btn btn-dark sm" id="addLoop-button-0-0"><i
-                                            class="fa-solid fa-retweet"></i> Add Loop</button>
+                                            class="fa-solid fa-retweet"></i><span class="hide-on-mobile fullButton"> Add Loop</span></button>
                                     <button type="button" class="btn btn-dark sm" id="addCond-button-0-0"><i
-                                            class="fa-solid fa-arrow-right-arrow-left"></i> Add Condition</button>
+                                            class="fa-solid fa-arrow-right-arrow-left"></i><span class="hide-on-mobile fullButton"> Add Condition</span></button>
                                 </div>
                             </div>
                         </div>
@@ -98,13 +98,10 @@
                             <div class="card-body">
                                 <div class="sideways">
                                     <Button type="button" class="btn btn-dark sm" id="addFlow">Add Flow</Button>
-                                    <Button type="button" class="btn btn-dark sm" id="addSolution">Save
-                                        Solution</Button>
+                                    <Button type="button" class="btn btn-dark sm" id="addSolution">Save Solution</Button>
                                     <Button type="button" class="btn btn-dark sm" id="newSolution">New Solution</Button>
-                                    <Button type="button" class="btn btn-dark sm" id="uploadZip">Upload Solution
-                                        Zip</Button>
-                                    <Button type="button" class="btn btn-dark sm" id="downloadYAML">Download
-                                        Solution</Button>
+                                    <Button type="button" class="btn btn-dark sm hide-on-mobile" id="uploadZip">Upload Solution Zip</Button>
+                                    <Button type="button" class="btn btn-dark sm hide-on-mobile" id="downloadYAML">Download Solution</Button>
                                     <input type="file" id="file-input" accept="application/zip"
                                         style="display: none;" />
                                 </div>
@@ -120,7 +117,7 @@
                                             <th>Daily Calls</th>
                                             <th>Actions</th>
                                             <th>Daily Runs</th>
-                                            <th>Days</th>
+                                            <th class="hide-on-mobile">Days</th>
                                         </tr>
                                         <tr>
                                             <td>Flow 1</td>
@@ -128,7 +125,7 @@
                                             <td>1</td>
                                             <td>1</td>
                                             <td>1</td>
-                                            <td>su|mo|tu|we|th|fr|sa</td>
+                                            <td class="hide-on-mobile">su|mo|tu|we|th|fr|sa</td>
                                         </tr>
                                     </table>
                                 </div>
@@ -305,6 +302,12 @@
                 <div id="message-box" class="modal-content" style="display: none;">
                     <p id="message-text">This is a message.</p>
                 </div>
+                <div id="import-box" class="modal-content" style="display: none;">
+                   <p>This upload will replace existing solution and wipe all iterations/mixes/days of week. Do you want to continue?</p>
+                    <button class="btn btn-dark sm" style="width:100%;" id="confirm-import-button">Continue</button>
+                    <br>
+                    <button class="btn btn-dark sm" style="width:100%;" id="cancel-import-button">Cancel</button>
+                </div>
             </div>
 
         </div>
@@ -312,7 +315,6 @@
         <script type="text/javascript" src="assets/js/bootstrap.bundle.min.js"></script>
         <script type="text/javascript" src="assets/js/tiny-slider.js"></script>
         <script type="text/javascript" src="assets/js/custom.js"></script>
-
         <script type="text/javascript" src="assets/js/calc.js"></script>
         <script type="text/javascript" src="assets/js/connectors.js"></script>
         <script type="text/javascript" src="assets/js/zip.min.js"></script>

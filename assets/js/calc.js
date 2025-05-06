@@ -30,6 +30,7 @@ const eModal=document.getElementById("modal");
 const eAccountName=document.getElementById("account-name-input");
 const eAccountBox=document.getElementById("account-box");
 const eMessageBox=document.getElementById("message-box");
+const eImportBox=document.getElementById("import-box");
 const eMessage=document.getElementById("message-text");
 
 let aContainers=[{
@@ -81,7 +82,8 @@ document.getElementById("import-solution").addEventListener('click',importSoluti
 document.getElementById("account-button").addEventListener("click", openAccount);
 document.getElementById("confirm-account-button").addEventListener("click", downloadAccount);
 document.getElementById("upload-account-button").addEventListener("click", importAccount);
-
+document.getElementById("confirm-import-button").addEventListener("click", confirmImport);
+document.getElementById("cancel-import-button").addEventListener("click", modalClose);
 
 const aDaysOfWeekChecks = document.querySelectorAll("input[name='days-1']");
 aDaysOfWeekChecks.forEach( item =>{
@@ -295,14 +297,14 @@ function updateSolutionTable(sFilter){
     }
     aRunningFlows.length=0;
     aFilteredFlows.length=0;
-    let sTableSolutions="<table class='table'><tr><th>Solution</th><th>Flows</th><th>Daily Calls</th><th>Modified</th><th></th></tr>";
-    let sTableFlows="<table class='table'><tr><th>Solution</th><th>Flow</th><th>Run Calls</th><th>Daily Calls</th><th>Days Of Week</th><th>Include</th></tr>";
+    let sTableSolutions="<table class='table'><tr><th>Solution</th><th>Flows</th><th>Daily Calls</th><th class='hide-on-mobile'>Modified</th><th></th></tr>";
+    let sTableFlows="<table class='table'><tr><th>Solution</th><th>Flow</th><th>Run Calls</th><th>Daily Calls</th><th class='hide-on-mobile'>Days Of Week</th><th class='hide-on-mobile'>Include</th></tr>";
     aSolutions.forEach(sol =>{    
         sol.dailyCalls=sol.flows.reduce((sum, item) => sum + Number(item.dailyCalls), 0);
         let sRow="<tr><td id='solution-"+sol.solutionId+"'>"+
         sol.solutionName+"</td><td>"+
         sol.flows.length+"</td><td>"+
-        Number(sol.dailyCalls)+"</td><td>"+
+        Number(sol.dailyCalls)+"</td><td class='hide-on-mobile'>"+
         sol.modified+"</td><td>"+
         "<Button class='btn btn-dark sm' id='delete-solution-"+sol.solutionId+"' style='margin-right:5px;'><i class='fa-solid fa-trash-can'></i></Button>"+
         "<Button class='btn btn-dark sm' id='filter-solution-"+sol.solutionId+"'><i class='fa-solid fa-filter'></i></Button>";
@@ -328,8 +330,8 @@ function updateSolutionTable(sFilter){
                     flow.solution+"</td><td>"+
                     sLicense+flow.name+"</td><td>"+
                     flow.runCalls+"</td><td>"+
-                    flow.dailyCalls+"</td><td>"+
-                    flow.daysOfWeek+"</td><td>"+
+                    flow.dailyCalls+"</td><td class='hide-on-mobile'>"+
+                    flow.daysOfWeek+"</td><td class='hide-on-mobile'>"+
                     "<div class='form-check form-switch'><input class='form-check-input' type='checkbox' role='switch' id='flow-"+flow.flowId+"' checked><label class='form-check-label' for='flow-"+flow.flowId+"'></label></div></td></tr>";
                     if(!flow.on){sRow=sRow.replace(" checked>",">")}
                     sTableFlows+=sRow;
@@ -363,9 +365,9 @@ function updateSolutionTable(sFilter){
                 if(bDayFound){
                     document.getElementById("flow-"+flow.flowId).addEventListener('change', function () {
                         flow.on=this.checked;  
-                                   
+                        updateTotals();                                     
                     });             
-                    aRunningFlows.push(flow)
+                    aRunningFlows.push(flow);
                 }
             })
         }
@@ -577,14 +579,14 @@ function updateTable(sCard){
             }
         )
     }
-    let sHTML="<table class='table'><tr><th>Flow</th><th>Run Calls</th><th>Dail Calls</th><th>Actions</th><th>Daily Runs</th><th>Days</th></tr>";
+    let sHTML="<table class='table'><tr><th>Flow</th><th>Run Calls</th><th>Dail Calls</th><th>Actions</th><th>Daily Runs</th><th class='hide-on-mobile'>Days</th></tr>";
     aCards.forEach(item =>{
         const sRow="<tr><td>"+
         item.name+"</td><td>"+
         item.runCalls+"</td><td>"+
         item.dailyCalls+"</td><td>"+
         item.actions+"</td><td>"+
-        item.dailyRuns+"</td><td>"+
+        item.dailyRuns+"</td><td class='hide-on-mobile'>"+
         item.daysOfWeek+"</td></tr>";
         sHTML+=sRow;
     })
@@ -966,4 +968,8 @@ function openMessage(sMessage){
     eAccountBox.style.display="none";
     eMessageBox.style.display="block";
     eModal.style.display="flex";
+}
+
+function confirmImport(){
+    unpackNestedZipFiles(null,true)
 }
