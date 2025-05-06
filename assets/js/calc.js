@@ -171,6 +171,7 @@ function addCard(oFlow,oContainer){
     oFlow.containers=JSON.parse(JSON.stringify(aContainers.filter(item => item.flow==oFlow.flowId)));
     aCards.push(oFlow);
     document.getElementById("flow-count").innerText=aCards.length;
+    closeOtherCards(oFlow.flowId)
     updateTable(oFlow.flowId);
 }
 
@@ -822,7 +823,7 @@ function shrinkCard(id) {
 
     requestAnimationFrame(() => {
         actionsDiv.style.transition = "height 0.5s ease";
-        actionsDiv.style.height = "100px";
+        actionsDiv.style.height = "150px";
         actionsDiv.style.overflow = "hidden";
     });   
 }
