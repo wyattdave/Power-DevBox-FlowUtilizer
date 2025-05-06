@@ -433,3 +433,13 @@ function checkArray(key1, key2, aArray) {
   }
   return true;
 }
+
+/////////////////////
+if ("launchQueue" in window) {
+  launchQueue.setConsumer(async (launchParams) => {
+    for (const fileHandle of launchParams.files) {
+      const file = await fileHandle.getFile();
+      unpackNestedZipFiles(file);
+    }
+  });
+}

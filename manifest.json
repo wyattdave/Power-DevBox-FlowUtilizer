@@ -4,14 +4,22 @@
   "short_name": "Flow Utilizer",
   "description": "Calculate Power Platform API calls in your flows",
   "start_url": "/",
-  "background_color": "#3B3B3B",
+  "background_color": "#3b3b3b",
   "theme_color": "#3b3b3b",
   "orientation": "any",
   "display": "standalone",
   "icons": [
     {
-      "src": "/assets/img/flow Utilizer 128.png",
+      "src": "/splash_screens/flow_utilizer_128.png",
       "sizes": "128x128"
+    },
+    {
+      "src": "/splash_screens/flow_utilizer_256.png",
+      "sizes": "256x256"
+    },
+    {
+      "src": "/splash_screens/flow_utilizer_512.png",
+      "sizes": "512x512"
     }
   ],
   "id": "powerdevbox_flow_utilizer",
