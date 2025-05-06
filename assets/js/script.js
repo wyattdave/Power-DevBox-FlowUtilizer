@@ -146,7 +146,9 @@ async function unpackNestedZipFiles(file) {
             let iNo=.5
             const iLevel=item.positionIndex.split("|").length-1;
             const sId=item.hashId.replace("MISSING",oFlow.id);
-            const sParentId=item.parentId.replace("MISSING",oFlow.id)
+            const sParentId=item.parentId.replace("MISSING",oFlow.id);
+            const iActionsY=aActions.filter(action =>{return action.parent==item.name && (action.branch == "y" || action.branch=="")}).length;
+            const iActionsN=aActions.filter(action =>{return action.parent==item.name  && action.branch =="n"}).length;
             if(convertContainer(item.type)=="condition"){
               if(item.notes.includes("Ratio:")){
                 const sRatio=oFlow.triggerNote.split("Ratio:")[1].split("|")[0];
@@ -158,9 +160,10 @@ async function unpackNestedZipFiles(file) {
                   iYes=iYes/100;
                   iNo=iNo/100;
                 }
-              }
-              const iActionsY=aActions.filter(action =>{return action.parent==item.name && (action.branch == "Yes" || action.branch=="")}).length;
-              const iActionsN=aActions.filter(action =>{return action.parent==item.name  && action.branch =="No"}).length;
+              }              
+              
+              let  iTotalCalls=Math.ceil(iActionsY*iYes);
+              if(iTotalCalls==NaN){iTotalCalls=0}
               aFlowContainers.push({
                 type:convertContainer(item.type),
                 name:item.name,
@@ -168,11 +171,13 @@ async function unpackNestedZipFiles(file) {
                 iterations:iNo,
                 parent:sParentId,
                 actions:iActionsY,
-                totalCalls:Math.ceil(iActionsY*iYes)+1,
+                totalCalls:iTotalCalls+1,
                 branch:"y",
                 flow:oFlow.id,
                 level:iLevel
               })
+              iTotalCalls=Math.ceil(iActionsN*iYes);
+              if(iTotalCalls==NaN){iTotalCalls=0}
               aFlowContainers.push({
                 type:convertContainer(item.type),
                 name:item.name,
@@ -180,7 +185,7 @@ async function unpackNestedZipFiles(file) {
                 iterations:iNo,
                 parent:sParentId,
                 actions:iActionsN,
-                totalCalls:Math.floor(iActionsN*iNo),
+                totalCalls:iTotalCalls,
                 branch:"n",
                 flow:oFlow.id,
                 level:iLevel
@@ -196,7 +201,7 @@ async function unpackNestedZipFiles(file) {
                 id: sId,
                 iterations:iIterations,
                 parent:sParentId,
-                actions:aActions.filter(action =>{return action.parent==item.name}).length,
+                actions:iActionsY,
                 totalCalls:iIterations*aActions.filter(action =>{return action.parent==item.name && (action.branch == "y" || action.branch=="")}).length+1,
                 branch:"y",
                 flow:oFlow.id,
@@ -205,24 +210,23 @@ async function unpackNestedZipFiles(file) {
             }
           })
 
-            let iTotalAPIS=0;
-            aFlowContainers.forEach(item =>{
-                iTotalAPIS+=item.totalCalls
-            })    
-
-
+          let iTotalAPIS=0;
+          aFlowContainers.forEach(item =>{
+              iTotalAPIS+=item.totalCalls
+          })    
+          console.log(oFlow.actionArray,oFlow.actionArray.length)
           aFlowCards.push({
             flowId:oFlow.id,
             name:oFlow.name,
-            dailyCalls:(iDaily*iTotalAPIS).toFixed(),
-            runCalls:iTotalAPIS.toFixed(),
-            actions:aActions.filter(action =>{return action.parent=="root"}).length,
-            dailyRuns:iDaily,
+            dailyCalls:Number((iDaily*iTotalAPIS).toFixed()),
+            runCalls:Number(iTotalAPIS.toFixed()),
+            actions:oFlow.actionArray.length,
+            dailyRuns:Number(iDaily),
             solution:oDependencies.ImportExportXml.SolutionManifest.UniqueName,
             on:true,
             containers:aFlowContainers.slice(),
             daysOfWeek:"su|mo|tu|we|th|fr|sa"
-          }) ;
+          })
           console.log(aFlowCards)
         })
 

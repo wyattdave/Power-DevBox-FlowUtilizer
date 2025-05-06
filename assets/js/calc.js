@@ -120,6 +120,7 @@ function addCard(oFlow,oContainer){
             parent:"0",
             actions:1,
             totalCalls:1,
+            branch:"y",
             flow:oFlow.flowId,
             level:0
         }
@@ -506,26 +507,25 @@ function updateActions(id,sCard,root){
 function updateCard(sCard){
     const updateItem=aCards.find(item => item.flowId === sCard);  
     const sDaysOfWeek=getSelectedDays(sCard);
+    let iTotalCalls=0;
     let iTotalActions=0;
     const aFlowContainers=aContainers.filter(item => item.flow==sCard && item.type!="action");
+    
     aFlowContainers.sort((a, b) => b.level - a.level);
     aFlowContainers.forEach(item =>{
-        let iAdd=0
+        let iAdd=0;
         if(item.type!="action" && item.branch!="n"){iAdd=1}
         Object.assign(item,
             {
                 totalCalls:(item.actions*item.iterations)+iAdd,
-
             }
         )
     })
     aFlowContainers.forEach(item =>{
-       console.log(item)
         const updateItem=aFlowContainers.find(action => item.parent==action.id);
         
         if(updateItem){
             const iCombinedCalls=updateItem.totalCalls+(item.totalCalls*updateItem.iterations);
-            console.log(iCombinedCalls)
             Object.assign(updateItem,
                 {
                     totalCalls:Math.ceil(iCombinedCalls),
@@ -537,21 +537,27 @@ function updateCard(sCard){
   
     const aRootContainers =aContainers.filter(item => item.flow==sCard && item.parent=="0");
     aRootContainers.forEach(item =>{
-        iTotalActions+=item.totalCalls
+        iTotalCalls+=item.totalCalls
     })
+
+    aContainers.forEach(item =>{
+        iTotalActions+=item.actions
+    })
+    const iContainerActionCount=aContainers.filter(item => item.flow==sCard && item.branch!="n" && item.type !="action").length;
 
     const iDaily = Number(document.getElementById("daily-"+sCard).value);
     Object.assign(updateItem,
         {
             containers: aContainers.filter(item => item.flow==sCard),
             daysOfWeek:sDaysOfWeek,
-            totalCalls:iTotalActions,
-            dailyRuns:iDaily
+            totalCalls:iTotalCalls,
+            actions:iTotalActions+iContainerActionCount,
+            dailyRuns:iDaily,
         }
     )
     
-    document.getElementById("apis-"+sCard).innerText=(iTotalActions*iDaily).toFixed();  
-    document.getElementById("runs-"+sCard).innerText=iTotalActions.toFixed();  
+    document.getElementById("apis-"+sCard).innerText=(iTotalCalls*iDaily).toFixed();  
+    document.getElementById("runs-"+sCard).innerText=iTotalCalls.toFixed();  
     updateTable(sCard);
 }
 
@@ -560,16 +566,12 @@ function updateTable(sCard){
     const updateItem=aCards.find(item => item.flowId === sCard);  
     if(updateItem){
         const updatedData = aContainers.filter(item =>{return item.flow==sCard});
-        let iTotalActions=0;
-        updatedData.forEach(item =>{
-            iTotalActions+=item.actions
-        })    
+        console.log(updatedData)
         Object.assign(updateItem,
             {
-                dailyCalls:Math.ceil(Number(document.getElementById("apis-"+sCard).innerText)).toFixed(),
-                runCalls:Math.ceil(Number(document.getElementById("runs-"+sCard).innerText)).toFixed(),
-                actions:iTotalActions,
-                dailyRuns:Math.ceil(Number(document.getElementById("daily-"+sCard).value)).toFixed(),
+                dailyCalls:Number(Math.ceil(Number(document.getElementById("apis-"+sCard).innerText)).toFixed()),
+                runCalls:Number(Math.ceil(Number(document.getElementById("runs-"+sCard).innerText)).toFixed()),
+                dailyRuns:Number(Math.ceil(Number(document.getElementById("daily-"+sCard).value)).toFixed()),
                 solution:eSolutionTitle.innerText,
                 daysOfWeek:sDaysOfWeek
             }
@@ -714,7 +716,7 @@ function newSolution(){
         daysOfWeek:"su|mo|tu|we|th|fr|sa"
     }
     eleftSection.innerHTML="";
-    addCard(oCards,{})
+    addCard(oCards,aContainers[0])
 
 }
 
