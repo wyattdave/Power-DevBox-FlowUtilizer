@@ -150,7 +150,7 @@ function addCard(oFlow,oContainer){
     document.getElementById("addLoop-button-"+oFlow.flowId+"-0").addEventListener("click", function () {addLoop("0",oFlow.flowId,{},0)});  
     document.getElementById("addCond-button-"+oFlow.flowId+"-0").addEventListener("click", function () {addCondition("0",oFlow.flowId,{},{},0)});  
     document.getElementById("daily-"+oFlow.flowId).addEventListener('click',function () {updateCard(oFlow.flowId)});
-    document.getElementById("title-"+oFlow.flowId).addEventListener('click',function () {updateCardTitle(oFlow.flowId)});
+    document.getElementById("title-"+oFlow.flowId).addEventListener('input',(event) => {updateCardTitle(oFlow.flowId)});
     document.getElementById("delete-button-card-"+oFlow.flowId).addEventListener('click',function () {deleteCard(oFlow.flowId)});
 
     document.getElementById("title-"+oFlow.flowId).innerText=oFlow.name;
