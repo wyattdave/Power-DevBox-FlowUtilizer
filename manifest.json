@@ -5,7 +5,7 @@
   "description": "Calculate Power Platform API calls in your flows",
   "start_url": "/",
   "background_color": "#3B3B3B",
-  "theme_color": "#ffffff",
+  "theme_color": "#3b3b3b",
   "orientation": "any",
   "display": "standalone",
   "icons": [
