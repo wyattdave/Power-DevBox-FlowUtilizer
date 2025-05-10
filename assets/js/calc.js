@@ -321,7 +321,7 @@ function updateSolutionTable(sFilter){
                 })
                 if(bDayFound){
                     let sLicense="";
-                    if(flow.dailyCalls>5000){
+                    if(flow.dailyCalls>6000){
                         sLicense="<img src='assets/img/premium diamond.svg' class='license-Small'>"
                     }
                     if(flow.dailyCalls>40000){
@@ -382,7 +382,7 @@ function updateTotals(){
     let sHTML="<p>Total Daily Runs:"+iTotalCalls+
     "</p><p>Running Flows:"+aFilteredFlows.length+"</p>"
     document.getElementById("left-totals").innerHTML=sHTML;
-    if(iTotalCalls>5000){
+    if(iTotalCalls>6000){
         ePremiumLicense.style="display:block"
     }else{
         ePremiumLicense.style.style="display:none"
