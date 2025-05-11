@@ -53,6 +53,7 @@ async function selectFile() {
 }
 
 async function unpackNestedZipFiles(file, bUpdate) {
+  trackEvent('import_asolution_export', 'Solution ifile imported');
  // try {
     aImportFlows=[];
     aEnvironmentVar=[];

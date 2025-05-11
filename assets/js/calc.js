@@ -730,6 +730,7 @@ function downloadAccount() {
     const sYAML=jsyaml.dump(aSolutions, { noRefs: true });
     downloadYaml(sYAML, sAccountName + ".yaml");
     modalClose()
+    trackEvent('download_account', 'Account Downloaded');
 }
 
 
@@ -743,7 +744,8 @@ function downloadSolution(){
     }
     console.log(oSolution)
     const sYAML=jsyaml.dump(oSolution,{noRefs:true});
-    downloadYaml(sYAML,eSolutionTitle.innerText+".yaml")
+    downloadYaml(sYAML,eSolutionTitle.innerText+".yaml");
+    trackEvent('download_solution', 'Solution Downloaded');
 }
 
 function downloadYaml(yamlString, filename) {
@@ -784,7 +786,8 @@ function importSolution(){
         }
     };
     input.click();
-    input.remove()
+    input.remove();
+    trackEvent('import_solution', 'Solution import');
 }
 
 function importAccount(){
@@ -811,6 +814,7 @@ function importAccount(){
     input.remove();
     modalClose();
     switchMode();
+    trackEvent('import_account', 'Account import');
 }
 
 function shrinkCard(id) {   
@@ -973,4 +977,16 @@ function openMessage(sMessage){
 
 function confirmImport(){
     unpackNestedZipFiles(null,true)
+}
+
+/////////////
+// Function to track events
+function trackEvent(action, label = '', value = '') {
+    if (typeof gtag === 'function') {
+        gtag('event', action, {
+            event_category: 'User Interaction',
+            event_label: label,
+            value: value
+        });
+    }
 }
